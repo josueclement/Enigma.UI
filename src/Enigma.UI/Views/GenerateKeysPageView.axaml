@@ -1,15 +1,84 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Enigma.UI.ViewModels"
+             xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
+             xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
              x:Class="Enigma.UI.Views.GenerateKeysPageView"
              x:DataType="vm:GenerateKeysPageViewModel">
 
-   <StackPanel Margin="24" Spacing="12">
-       <TextBlock Text="Generate Keys"
-                  FontSize="24"
-                  FontWeight="SemiBold" />
-   </StackPanel>
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="16">
+      <TextBlock Text="Generate Keys"
+                 FontSize="24"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="Generate cryptographic key pairs for encryption, signing, and post-quantum algorithms."
+                 Opacity="0.7" TextWrapping="Wrap" />
+
+      <!-- Algorithm Configuration -->
+      <carbon:SettingsCardExpander Header="Algorithm Configuration"
+                                  Description="Select the algorithm and parameters for key generation"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Algorithm" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding AlgorithmOptions}"
+                    SelectedIndex="{Binding SelectedAlgorithmIndex}"
+                    HorizontalAlignment="Stretch" />
+          <TextBlock Text="Parameters" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding ParameterOptions}"
+                    SelectedIndex="{Binding SelectedParameterIndex}"
+                    HorizontalAlignment="Stretch" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Private Key Protection -->
+      <carbon:SettingsCardExpander Header="Private Key Protection"
+                                  Description="Optionally encrypt the private key with a password">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Password"
+                              Text="{Binding Password}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Enter password (optional)" />
+          <editors:TextEditor Title="Confirm Password"
+                              Text="{Binding ConfirmPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Confirm password" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Output Files -->
+      <carbon:SettingsCardExpander Header="Output Files"
+                                  Description="Select where to save the generated keys"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Content="Browse..."
+                    Command="{Binding BrowsePublicKeyPathCommand}"
+                    Margin="8,0,0,0" />
+            <editors:TextEditor Title="Public Key File"
+                                Text="{Binding PublicKeyPath}"
+                                IsReadOnly="True"
+                                Watermark="Select public key output path..." />
+          </DockPanel>
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Content="Browse..."
+                    Command="{Binding BrowsePrivateKeyPathCommand}"
+                    Margin="8,0,0,0" />
+            <editors:TextEditor Title="Private Key File"
+                                Text="{Binding PrivateKeyPath}"
+                                IsReadOnly="True"
+                                Watermark="Select private key output path..." />
+          </DockPanel>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Generate Button -->
+      <Button Content="Generate Keys"
+              Command="{Binding GenerateKeysCommand}"
+              HorizontalAlignment="Right"
+              Classes="accent" />
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>
