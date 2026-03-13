@@ -17,76 +17,85 @@
       <TextBlock Text="Encrypt or decrypt files using password-based or public-key cryptography."
                  Opacity="0.7" TextWrapping="Wrap" />
 
-      <!-- Encryption Type -->
-      <carbon:SettingsCardExpander Header="Encryption Type"
-                                  Description="Select the encryption method and cipher algorithm"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Encryption Type" FontWeight="SemiBold" />
-          <ComboBox ItemsSource="{Binding EncryptionTypeOptions}"
-                    SelectedIndex="{Binding SelectedEncryptionTypeIndex}"
-                    HorizontalAlignment="Stretch" />
-          <TextBlock Text="Cipher Algorithm" FontWeight="SemiBold" />
-          <ComboBox ItemsSource="{Binding CipherOptions}"
-                    SelectedIndex="{Binding SelectedCipherIndex}"
-                    HorizontalAlignment="Stretch" />
-        </StackPanel>
-      </carbon:SettingsCardExpander>
+      <Grid ColumnDefinitions="*,16,*">
+        <!-- Encryption Type -->
+        <carbon:SettingsCardExpander Grid.Column="0"
+                                    VerticalAlignment="Top"
+                                    Header="Encryption Type"
+                                    Description="Select the encryption method and cipher algorithm"
+                                    IsExpanded="True">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Encryption Type" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding EncryptionTypeOptions}"
+                      SelectedIndex="{Binding SelectedEncryptionTypeIndex}"
+                      HorizontalAlignment="Stretch" />
+            <TextBlock Text="Cipher Algorithm" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding CipherOptions}"
+                      SelectedIndex="{Binding SelectedCipherIndex}"
+                      HorizontalAlignment="Stretch" />
+          </StackPanel>
+        </carbon:SettingsCardExpander>
 
-      <!-- Password Settings -->
-      <carbon:SettingsCardExpander Header="Password Settings"
-                                  Description="Configure the password and key derivation parameters"
-                                  IsVisible="{Binding IsPasswordBased}"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <editors:TextEditor Title="Password"
-                              Text="{Binding Password}"
-                              PasswordChar="&#x2022;"
-                              Watermark="Enter password" />
-          <editors:TextEditor Title="Confirm Password"
-                              Text="{Binding ConfirmPassword}"
-                              PasswordChar="&#x2022;"
-                              Watermark="Confirm password" />
-          <editors:IntEditor Title="Iterations"
-                             Value="{Binding Iterations}"
-                             IsVisible="{Binding IsPbkdf2}"
-                             Watermark="100000" />
-          <editors:IntEditor Title="Argon2 Iterations"
-                             Value="{Binding Argon2Iterations}"
-                             IsVisible="{Binding IsArgon2}"
-                             Watermark="10" />
-          <editors:IntEditor Title="Argon2 Parallelism"
-                             Value="{Binding Argon2Parallelism}"
-                             IsVisible="{Binding IsArgon2}"
-                             Watermark="4" />
-          <editors:IntEditor Title="Argon2 Memory (power of 2)"
-                             Value="{Binding Argon2MemoryPowOfTwo}"
-                             IsVisible="{Binding IsArgon2}"
-                             Watermark="16" />
-        </StackPanel>
-      </carbon:SettingsCardExpander>
+        <!-- Password Settings -->
+        <carbon:SettingsCardExpander Grid.Column="2"
+                                    VerticalAlignment="Top"
+                                    Header="Password Settings"
+                                    Description="Configure the password and key derivation parameters"
+                                    IsVisible="{Binding IsPasswordBased}"
+                                    IsExpanded="True">
+          <StackPanel Spacing="12">
+            <editors:TextEditor Title="Password"
+                                Text="{Binding Password}"
+                                PasswordChar="&#x2022;"
+                                Watermark="Enter password" />
+            <editors:TextEditor Title="Confirm Password"
+                                Text="{Binding ConfirmPassword}"
+                                PasswordChar="&#x2022;"
+                                Watermark="Confirm password" />
+            <editors:IntEditor Title="Iterations"
+                               Value="{Binding Iterations}"
+                               IsVisible="{Binding IsPbkdf2}"
+                               Watermark="100000" />
+            <editors:IntEditor Title="Argon2 Iterations"
+                               Value="{Binding Argon2Iterations}"
+                               IsVisible="{Binding IsArgon2}"
+                               Watermark="10" />
+            <editors:IntEditor Title="Argon2 Parallelism"
+                               Value="{Binding Argon2Parallelism}"
+                               IsVisible="{Binding IsArgon2}"
+                               Watermark="4" />
+            <editors:IntEditor Title="Argon2 Memory (power of 2)"
+                               Value="{Binding Argon2MemoryPowOfTwo}"
+                               IsVisible="{Binding IsArgon2}"
+                               Watermark="16" />
+          </StackPanel>
+        </carbon:SettingsCardExpander>
 
-      <!-- Key Settings -->
-      <carbon:SettingsCardExpander Header="Key Settings"
-                                  Description="Select the key file for encryption or decryption"
-                                  IsVisible="{Binding IsKeyBased}"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <DockPanel>
-            <Button DockPanel.Dock="Right" Content="Browse..."
-                    Command="{Binding BrowseKeyFileCommand}"
-                    Margin="8,0,0,0" />
-            <editors:TextEditor Title="Key File"
-                                Text="{Binding KeyFilePath}"
-                                IsReadOnly="True"
-                                Watermark="Select key file..." />
-          </DockPanel>
-          <editors:TextEditor Title="Key Password"
-                              Text="{Binding KeyPassword}"
-                              PasswordChar="&#x2022;"
-                              Watermark="Password for encrypted private key (optional)" />
-        </StackPanel>
-      </carbon:SettingsCardExpander>
+        <!-- Key Settings -->
+        <carbon:SettingsCardExpander Grid.Column="2"
+                                    VerticalAlignment="Top"
+                                    Header="Key Settings"
+                                    Description="Select the key file for encryption or decryption"
+                                    IsVisible="{Binding IsKeyBased}"
+                                    IsExpanded="True">
+          <StackPanel Spacing="12">
+            <DockPanel>
+              <Button DockPanel.Dock="Right" Content="Browse..."
+                      Command="{Binding BrowseKeyFileCommand}"
+                      VerticalAlignment="Bottom"
+                      Margin="8,0,0,0" />
+              <editors:TextEditor Title="Key File"
+                                  Text="{Binding KeyFilePath}"
+                                  IsReadOnly="True"
+                                  Watermark="Select key file..." />
+            </DockPanel>
+            <editors:TextEditor Title="Key Password"
+                                Text="{Binding KeyPassword}"
+                                PasswordChar="&#x2022;"
+                                Watermark="Password for encrypted private key (optional)" />
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+      </Grid>
 
       <!-- Files -->
       <carbon:SettingsCardExpander Header="Files"
@@ -96,6 +105,7 @@
           <DockPanel>
             <Button DockPanel.Dock="Right" Content="Browse..."
                     Command="{Binding BrowseInputFileCommand}"
+                    VerticalAlignment="Bottom"
                     Margin="8,0,0,0" />
             <editors:TextEditor Title="Input File"
                                 Text="{Binding InputFilePath}"
@@ -105,6 +115,7 @@
           <DockPanel>
             <Button DockPanel.Dock="Right" Content="Browse..."
                     Command="{Binding BrowseOutputFileCommand}"
+                    VerticalAlignment="Bottom"
                     Margin="8,0,0,0" />
             <editors:TextEditor Title="Output File"
                                 Text="{Binding OutputFilePath}"

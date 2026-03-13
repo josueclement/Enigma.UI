@@ -23,68 +23,78 @@
                  FontWeight="SemiBold"
                  Margin="0,8,0,0" />
 
-      <!-- License Details -->
-      <carbon:SettingsCardExpander Header="License Details"
-                                  Description="Configure the license metadata"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <editors:TextEditor Title="Product ID"
-                              Text="{Binding ProductId}"
-                              Watermark="Enter product identifier" />
-          <editors:TextEditor Title="Owner"
-                              Text="{Binding Owner}"
-                              Watermark="Enter license owner" />
-          <editors:TextEditor Title="Device ID"
-                              Text="{Binding DeviceId}"
-                              Watermark="Enter device identifier (optional)" />
-          <StackPanel Orientation="Horizontal" Spacing="12">
-            <CheckBox Content="Set Expiration Date"
-                      IsChecked="{Binding HasExpiration}" />
-            <CalendarDatePicker SelectedDate="{Binding ExpirationDate}"
-                                IsVisible="{Binding HasExpiration}"
-                                Watermark="Select date" />
+      <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
+        <!-- License Details -->
+        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="0"
+                                    VerticalAlignment="Top"
+                                    Header="License Details"
+                                    Description="Configure the license metadata"
+                                    IsExpanded="True">
+          <StackPanel Spacing="12">
+            <editors:TextEditor Title="Product ID"
+                                Text="{Binding ProductId}"
+                                Watermark="Enter product identifier" />
+            <editors:TextEditor Title="Owner"
+                                Text="{Binding Owner}"
+                                Watermark="Enter license owner" />
+            <editors:TextEditor Title="Device ID"
+                                Text="{Binding DeviceId}"
+                                Watermark="Enter device identifier (optional)" />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <CheckBox Content="Set Expiration Date"
+                        IsChecked="{Binding HasExpiration}" />
+              <CalendarDatePicker SelectedDate="{Binding ExpirationDate}"
+                                  IsVisible="{Binding HasExpiration}"
+                                  Watermark="Select date" />
+            </StackPanel>
           </StackPanel>
-        </StackPanel>
-      </carbon:SettingsCardExpander>
+        </carbon:SettingsCardExpander>
 
-      <!-- Signing Configuration -->
-      <carbon:SettingsCardExpander Header="Signing Configuration"
-                                  Description="Select the signing algorithm and private key"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Signing Algorithm" FontWeight="SemiBold" />
-          <ComboBox ItemsSource="{Binding SigningAlgorithmOptions}"
-                    SelectedIndex="{Binding SelectedSigningAlgorithmIndex}"
-                    HorizontalAlignment="Stretch" />
+        <!-- Signing Configuration -->
+        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="2"
+                                    VerticalAlignment="Top"
+                                    Header="Signing Configuration"
+                                    Description="Select the signing algorithm and private key"
+                                    IsExpanded="True">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Signing Algorithm" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding SigningAlgorithmOptions}"
+                      SelectedIndex="{Binding SelectedSigningAlgorithmIndex}"
+                      HorizontalAlignment="Stretch" />
+            <DockPanel>
+              <Button DockPanel.Dock="Right" Content="Browse..."
+                      Command="{Binding BrowseSigningKeyCommand}"
+                      VerticalAlignment="Bottom"
+                      Margin="8,0,0,0" />
+              <editors:TextEditor Title="Private Key File"
+                                  Text="{Binding SigningKeyPath}"
+                                  IsReadOnly="True"
+                                  Watermark="Select signing key..." />
+            </DockPanel>
+            <editors:TextEditor Title="Key Password"
+                                Text="{Binding SigningKeyPassword}"
+                                PasswordChar="&#x2022;"
+                                Watermark="Password for encrypted key (optional)" />
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+
+        <!-- Output -->
+        <carbon:SettingsCardExpander Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                    Header="Output"
+                                    Description="Select where to save the license file"
+                                    IsExpanded="True">
           <DockPanel>
             <Button DockPanel.Dock="Right" Content="Browse..."
-                    Command="{Binding BrowseSigningKeyCommand}"
+                    Command="{Binding BrowseLicenseOutputCommand}"
+                    VerticalAlignment="Bottom"
                     Margin="8,0,0,0" />
-            <editors:TextEditor Title="Private Key File"
-                                Text="{Binding SigningKeyPath}"
+            <editors:TextEditor Title="License File"
+                                Text="{Binding LicenseOutputPath}"
                                 IsReadOnly="True"
-                                Watermark="Select signing key..." />
+                                Watermark="Select license output path..." />
           </DockPanel>
-          <editors:TextEditor Title="Key Password"
-                              Text="{Binding SigningKeyPassword}"
-                              PasswordChar="&#x2022;"
-                              Watermark="Password for encrypted key (optional)" />
-        </StackPanel>
-      </carbon:SettingsCardExpander>
-
-      <!-- Output -->
-      <carbon:SettingsCardExpander Header="Output"
-                                  Description="Select where to save the license file">
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Content="Browse..."
-                  Command="{Binding BrowseLicenseOutputCommand}"
-                  Margin="8,0,0,0" />
-          <editors:TextEditor Title="License File"
-                              Text="{Binding LicenseOutputPath}"
-                              IsReadOnly="True"
-                              Watermark="Select license output path..." />
-        </DockPanel>
-      </carbon:SettingsCardExpander>
+        </carbon:SettingsCardExpander>
+      </Grid>
 
       <!-- Generate Button -->
       <Button Content="Generate License"
@@ -108,6 +118,7 @@
           <DockPanel>
             <Button DockPanel.Dock="Right" Content="Browse..."
                     Command="{Binding BrowseValidateLicenseCommand}"
+                    VerticalAlignment="Bottom"
                     Margin="8,0,0,0" />
             <editors:TextEditor Title="License File"
                                 Text="{Binding ValidateLicensePath}"
@@ -117,6 +128,7 @@
           <DockPanel>
             <Button DockPanel.Dock="Right" Content="Browse..."
                     Command="{Binding BrowseValidatePublicKeyCommand}"
+                    VerticalAlignment="Bottom"
                     Margin="8,0,0,0" />
             <editors:TextEditor Title="Public Key File"
                                 Text="{Binding ValidatePublicKeyPath}"
