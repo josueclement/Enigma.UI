@@ -1,6 +1,8 @@
 using Carbon.Avalonia.Desktop.Services;
+using Enigma.UI.Models;
 using Enigma.UI.ViewModels;
 using Enigma.UI.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Enigma.UI;
@@ -9,6 +11,12 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
+        public void AddAppConfiguration(IConfiguration configuration)
+        {
+            _ = services.Configure<DefaultPathsOptions>(
+                configuration.GetSection(DefaultPathsOptions.SectionName));
+        }
+
         public void AddCarbonServices()
         {
             _ = services.AddSingleton<IFileDialogService, FileDialogService>();

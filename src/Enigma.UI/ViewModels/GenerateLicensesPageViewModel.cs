@@ -8,6 +8,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Enigma.Cryptography.Utils;
 using Enigma.LicenseManager;
+using Enigma.UI.Models;
+using Microsoft.Extensions.Options;
 
 namespace Enigma.UI.ViewModels;
 
@@ -15,11 +17,16 @@ public class GenerateLicensesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly DefaultPathsOptions _defaultPaths;
 
-    public GenerateLicensesPageViewModel(IFileDialogService fileDialogService, IInfoBarService infoBarService)
+    public GenerateLicensesPageViewModel(
+        IFileDialogService fileDialogService,
+        IInfoBarService infoBarService,
+        IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _defaultPaths = defaultPaths.Value;
 
         BrowseSigningKeyCommand = new AsyncRelayCommand(BrowseSigningKeyAsync);
         BrowseLicenseOutputCommand = new AsyncRelayCommand(BrowseLicenseOutputAsync);
@@ -165,7 +172,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
     private async Task BrowseSigningKeyAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select Signing Key", false, "", "", null);
+            "Select Signing Key", false, _defaultPaths.Keys, "", null);
         if (paths.Any())
             SigningKeyPath = paths.First();
     }
@@ -173,7 +180,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
     private async Task BrowseLicenseOutputAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
-            "Save License", "", "license.json", ".json", true, null);
+            "Save License", _defaultPaths.Licenses, "license.json", ".json", true, null);
         if (path is not null)
             LicenseOutputPath = path;
     }
@@ -183,7 +190,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
     private async Task BrowseValidateLicenseAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select License File", false, "", "", null);
+            "Select License File", false, _defaultPaths.Licenses, "", null);
         if (paths.Any())
             ValidateLicensePath = paths.First();
     }
@@ -191,7 +198,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
     private async Task BrowseValidatePublicKeyAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select Public Key", false, "", "", null);
+            "Select Public Key", false, _defaultPaths.Keys, "", null);
         if (paths.Any())
             ValidatePublicKeyPath = paths.First();
     }
@@ -255,7 +262,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
                 : PemUtils.LoadKey(keyStream);
 
             var builder = new LicenseBuilder()
-                .SetId(Guid.NewGuid().ToString())
+                .SetId(Ulid.NewUlid().ToString())
                 .SetCreationDate(DateTime.UtcNow)
                 .SetProductId(ProductId)
                 .SetOwner(Owner);

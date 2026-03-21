@@ -1,4 +1,5 @@
 using Avalonia;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -26,14 +27,22 @@ sealed class Program
                 Environment.Exit(0);
         };
 
+        var configPath = ConfigurationSetup.GetConfigFilePath();
+        ConfigurationSetup.EnsureConfigFileExists(configPath);
+
         AppHost = Host.CreateDefaultBuilder(args)
-            .ConfigureServices((_, services) =>
+            .ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddJsonFile(configPath, optional: true, reloadOnChange: false);
+            })
+            .ConfigureServices((context, services) =>
             {
                 services.AddLogging(builder =>
                 {
                     builder.ClearProviders();
                     builder.AddNLog();
                 });
+                services.AddAppConfiguration(context.Configuration);
                 services.AddCarbonServices();
                 services.AddPagesAndViewModels();
             })

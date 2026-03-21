@@ -9,6 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 using Enigma.Cryptography.PQC;
 using Enigma.Cryptography.PublicKey;
 using Enigma.Cryptography.Utils;
+using Enigma.UI.Models;
+using Microsoft.Extensions.Options;
 
 namespace Enigma.UI.ViewModels;
 
@@ -16,11 +18,16 @@ public class GenerateKeysPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly DefaultPathsOptions _defaultPaths;
 
-    public GenerateKeysPageViewModel(IFileDialogService fileDialogService, IInfoBarService infoBarService)
+    public GenerateKeysPageViewModel(
+        IFileDialogService fileDialogService,
+        IInfoBarService infoBarService,
+        IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _defaultPaths = defaultPaths.Value;
         UpdateParameterOptions();
 
         BrowsePublicKeyPathCommand = new AsyncRelayCommand(BrowsePublicKeyPathAsync);
@@ -107,7 +114,7 @@ public class GenerateKeysPageViewModel : ObservableObject
     private async Task BrowsePublicKeyPathAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
-            "Save Public Key", "", "public.pem", ".pem", true, null);
+            "Save Public Key", _defaultPaths.Keys, "public.pem", ".pem", true, null);
         if (path is not null)
             PublicKeyPath = path;
     }
@@ -115,7 +122,7 @@ public class GenerateKeysPageViewModel : ObservableObject
     private async Task BrowsePrivateKeyPathAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
-            "Save Private Key", "", "private.pem", ".pem", true, null);
+            "Save Private Key", _defaultPaths.Keys, "private.pem", ".pem", true, null);
         if (path is not null)
             PrivateKeyPath = path;
     }

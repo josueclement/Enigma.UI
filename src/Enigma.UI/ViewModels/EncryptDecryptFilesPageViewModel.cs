@@ -10,6 +10,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Enigma.Cryptography.DataEncryption;
 using Enigma.Cryptography.Utils;
+using Enigma.UI.Models;
+using Microsoft.Extensions.Options;
 
 namespace Enigma.UI.ViewModels;
 
@@ -17,12 +19,17 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly DefaultPathsOptions _defaultPaths;
     private CancellationTokenSource? _cts;
 
-    public EncryptDecryptFilesPageViewModel(IFileDialogService fileDialogService, IInfoBarService infoBarService)
+    public EncryptDecryptFilesPageViewModel(
+        IFileDialogService fileDialogService,
+        IInfoBarService infoBarService,
+        IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _defaultPaths = defaultPaths.Value;
 
         BrowseKeyFileCommand = new AsyncRelayCommand(BrowseKeyFileAsync);
         BrowseInputFileCommand = new AsyncRelayCommand(BrowseInputFileAsync);
@@ -167,7 +174,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     private async Task BrowseKeyFileAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select Key File", false, "", "", null);
+            "Select Key File", false, _defaultPaths.Keys, "", null);
         if (paths.Any())
             KeyFilePath = paths.First();
     }
@@ -175,7 +182,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     private async Task BrowseInputFileAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select Input File", false, "", "", null);
+            "Select Input File", false, _defaultPaths.EncryptedFiles, "", null);
         if (paths.Any())
             InputFilePath = paths.First();
     }
@@ -183,7 +190,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     private async Task BrowseOutputFileAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
-            "Save Output File", "", "", "", true, null);
+            "Save Output File", _defaultPaths.EncryptedFiles, "", "", true, null);
         if (path is not null)
             OutputFilePath = path;
     }

@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Carbon.Avalonia.Desktop.Services;
+using Enigma.UI.Models;
 using Enigma.UI.ViewModels;
 using Enigma.UI.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,6 +68,7 @@ public partial class App : Application
             builder.ClearProviders();
             builder.AddNLog();
         });
+        services.Configure<DefaultPathsOptions>(_ => { });
         services.AddCarbonServices();
         services.AddPagesAndViewModels();
         return services.BuildServiceProvider();
