@@ -20,13 +20,14 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Carbon.Avalonia.Desktop" Version="*" />
-    <PackageReference Include="Enigma.Cryptography" Version="*" />
-    <PackageReference Include="Enigma.Cryptography.DataEncryption" Version="1.1.0" />
-    <PackageReference Include="Enigma.LicenseManager" Version="1.0.0" />
+    <PackageReference Include="Enigma.Cryptography" Version="4.2.1" />
+    <PackageReference Include="Enigma.Cryptography.DataEncryption" Version="1.2.0" />
+    <PackageReference Include="Enigma.LicenseManager" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="*" />
     <PackageReference Include="NLog" Version="6.1.1" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.1.2" />
     <PackageReference Include="PhosphorIconsAvalonia" Version="1.1.0" />
+    <PackageReference Include="Ulid" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>

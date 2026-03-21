@@ -13,7 +13,7 @@ using Enigma.Cryptography.Utils;
 
 namespace Enigma.UI.ViewModels;
 
-public partial class EncryptDecryptFilesPageViewModel : ObservableObject
+public class EncryptDecryptFilesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
@@ -23,7 +23,21 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+
+        BrowseKeyFileCommand = new AsyncRelayCommand(BrowseKeyFileAsync);
+        BrowseInputFileCommand = new AsyncRelayCommand(BrowseInputFileAsync);
+        BrowseOutputFileCommand = new AsyncRelayCommand(BrowseOutputFileAsync);
+        EncryptCommand = new AsyncRelayCommand(EncryptAsync);
+        DecryptCommand = new AsyncRelayCommand(DecryptAsync);
+        CancelCommand = new RelayCommand(Cancel);
     }
+
+    public AsyncRelayCommand BrowseKeyFileCommand { get; }
+    public AsyncRelayCommand BrowseInputFileCommand { get; }
+    public AsyncRelayCommand BrowseOutputFileCommand { get; }
+    public AsyncRelayCommand EncryptCommand { get; }
+    public AsyncRelayCommand DecryptCommand { get; }
+    public RelayCommand CancelCommand { get; }
 
     public string[] EncryptionTypeOptions { get; } = ["PBKDF2", "Argon2", "RSA", "ML-KEM"];
 
@@ -150,7 +164,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
         _ => Cipher.Aes256Gcm
     };
 
-    [RelayCommand]
     private async Task BrowseKeyFileAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
@@ -159,7 +172,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
             KeyFilePath = paths.First();
     }
 
-    [RelayCommand]
     private async Task BrowseInputFileAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
@@ -168,7 +180,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
             InputFilePath = paths.First();
     }
 
-    [RelayCommand]
     private async Task BrowseOutputFileAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
@@ -177,7 +188,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
             OutputFilePath = path;
     }
 
-    [RelayCommand]
     private async Task EncryptAsync()
     {
         if (IsBusy) return;
@@ -302,7 +312,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
     private async Task DecryptAsync()
     {
         if (IsBusy) return;
@@ -416,7 +425,6 @@ public partial class EncryptDecryptFilesPageViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
     private void Cancel()
     {
         _cts?.Cancel();

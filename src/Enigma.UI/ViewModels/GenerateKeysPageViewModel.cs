@@ -12,7 +12,7 @@ using Enigma.Cryptography.Utils;
 
 namespace Enigma.UI.ViewModels;
 
-public partial class GenerateKeysPageViewModel : ObservableObject
+public class GenerateKeysPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
@@ -22,7 +22,15 @@ public partial class GenerateKeysPageViewModel : ObservableObject
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
         UpdateParameterOptions();
+
+        BrowsePublicKeyPathCommand = new AsyncRelayCommand(BrowsePublicKeyPathAsync);
+        BrowsePrivateKeyPathCommand = new AsyncRelayCommand(BrowsePrivateKeyPathAsync);
+        GenerateKeysCommand = new AsyncRelayCommand(GenerateKeysAsync);
     }
+
+    public AsyncRelayCommand BrowsePublicKeyPathCommand { get; }
+    public AsyncRelayCommand BrowsePrivateKeyPathCommand { get; }
+    public AsyncRelayCommand GenerateKeysCommand { get; }
 
     public string[] AlgorithmOptions { get; } = ["RSA", "ML-KEM", "ML-DSA"];
 
@@ -96,7 +104,6 @@ public partial class GenerateKeysPageViewModel : ObservableObject
         SelectedParameterIndex = 0;
     }
 
-    [RelayCommand]
     private async Task BrowsePublicKeyPathAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
@@ -105,7 +112,6 @@ public partial class GenerateKeysPageViewModel : ObservableObject
             PublicKeyPath = path;
     }
 
-    [RelayCommand]
     private async Task BrowsePrivateKeyPathAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
@@ -114,7 +120,6 @@ public partial class GenerateKeysPageViewModel : ObservableObject
             PrivateKeyPath = path;
     }
 
-    [RelayCommand]
     private async Task GenerateKeysAsync()
     {
         if (IsBusy) return;

@@ -11,7 +11,7 @@ using Enigma.LicenseManager;
 
 namespace Enigma.UI.ViewModels;
 
-public partial class GenerateLicensesPageViewModel : ObservableObject
+public class GenerateLicensesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
@@ -20,7 +20,21 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+
+        BrowseSigningKeyCommand = new AsyncRelayCommand(BrowseSigningKeyAsync);
+        BrowseLicenseOutputCommand = new AsyncRelayCommand(BrowseLicenseOutputAsync);
+        BrowseValidateLicenseCommand = new AsyncRelayCommand(BrowseValidateLicenseAsync);
+        BrowseValidatePublicKeyCommand = new AsyncRelayCommand(BrowseValidatePublicKeyAsync);
+        GenerateLicenseCommand = new AsyncRelayCommand(GenerateLicenseAsync);
+        ValidateLicenseCommand = new AsyncRelayCommand(ValidateLicenseAsync);
     }
+
+    public AsyncRelayCommand BrowseSigningKeyCommand { get; }
+    public AsyncRelayCommand BrowseLicenseOutputCommand { get; }
+    public AsyncRelayCommand BrowseValidateLicenseCommand { get; }
+    public AsyncRelayCommand BrowseValidatePublicKeyCommand { get; }
+    public AsyncRelayCommand GenerateLicenseCommand { get; }
+    public AsyncRelayCommand ValidateLicenseCommand { get; }
 
     // --- Generation properties ---
 
@@ -148,7 +162,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
 
     // --- Browse commands (Generation) ---
 
-    [RelayCommand]
     private async Task BrowseSigningKeyAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
@@ -157,7 +170,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
             SigningKeyPath = paths.First();
     }
 
-    [RelayCommand]
     private async Task BrowseLicenseOutputAsync()
     {
         var path = await _fileDialogService.ShowSaveFileDialogAsync(
@@ -168,7 +180,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
 
     // --- Browse commands (Validation) ---
 
-    [RelayCommand]
     private async Task BrowseValidateLicenseAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
@@ -177,7 +188,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
             ValidateLicensePath = paths.First();
     }
 
-    [RelayCommand]
     private async Task BrowseValidatePublicKeyAsync()
     {
         var paths = await _fileDialogService.ShowOpenFileDialogAsync(
@@ -188,7 +198,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
 
     // --- Generate License ---
 
-    [RelayCommand]
     private async Task GenerateLicenseAsync()
     {
         if (IsBusy) return;
@@ -291,7 +300,6 @@ public partial class GenerateLicensesPageViewModel : ObservableObject
 
     // --- Validate License ---
 
-    [RelayCommand]
     private async Task ValidateLicenseAsync()
     {
         if (IsBusy) return;
