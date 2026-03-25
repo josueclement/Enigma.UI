@@ -82,15 +82,38 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     public string? Password
     {
         get => _password;
-        set => SetProperty(ref _password, value);
+        set
+        {
+            if (SetProperty(ref _password, value))
+            {
+                PasswordHasError = false;
+                OnPropertyChanged(nameof(HasPasswordMismatch));
+                OnPropertyChanged(nameof(PasswordMismatchMessage));
+            }
+        }
     }
 
     private string? _confirmPassword;
     public string? ConfirmPassword
     {
         get => _confirmPassword;
-        set => SetProperty(ref _confirmPassword, value);
+        set
+        {
+            if (SetProperty(ref _confirmPassword, value))
+            {
+                OnPropertyChanged(nameof(HasPasswordMismatch));
+                OnPropertyChanged(nameof(PasswordMismatchMessage));
+            }
+        }
     }
+
+    public bool HasPasswordMismatch =>
+        !string.IsNullOrEmpty(Password) &&
+        !string.IsNullOrEmpty(ConfirmPassword) &&
+        Password != ConfirmPassword;
+
+    public string? PasswordMismatchMessage =>
+        HasPasswordMismatch ? "Passwords do not match" : null;
 
     private int _iterations = 100000;
     public int Iterations
@@ -124,7 +147,11 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     public string? KeyFilePath
     {
         get => _keyFilePath;
-        set => SetProperty(ref _keyFilePath, value);
+        set
+        {
+            if (SetProperty(ref _keyFilePath, value))
+                KeyFileHasError = false;
+        }
     }
 
     private string? _keyPassword;
@@ -138,14 +165,52 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     public string? InputFilePath
     {
         get => _inputFilePath;
-        set => SetProperty(ref _inputFilePath, value);
+        set
+        {
+            if (SetProperty(ref _inputFilePath, value))
+                InputFileHasError = false;
+        }
     }
 
     private string? _outputFilePath;
     public string? OutputFilePath
     {
         get => _outputFilePath;
-        set => SetProperty(ref _outputFilePath, value);
+        set
+        {
+            if (SetProperty(ref _outputFilePath, value))
+                OutputFileHasError = false;
+        }
+    }
+
+    // --- Validation error flags ---
+
+    private bool _passwordHasError;
+    public bool PasswordHasError
+    {
+        get => _passwordHasError;
+        set => SetProperty(ref _passwordHasError, value);
+    }
+
+    private bool _keyFileHasError;
+    public bool KeyFileHasError
+    {
+        get => _keyFileHasError;
+        set => SetProperty(ref _keyFileHasError, value);
+    }
+
+    private bool _inputFileHasError;
+    public bool InputFileHasError
+    {
+        get => _inputFileHasError;
+        set => SetProperty(ref _inputFileHasError, value);
+    }
+
+    private bool _outputFileHasError;
+    public bool OutputFileHasError
+    {
+        get => _outputFileHasError;
+        set => SetProperty(ref _outputFileHasError, value);
     }
 
     private int _progress;
@@ -195,55 +260,28 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
             OutputFilePath = path;
     }
 
-    private async Task EncryptAsync()
+    private bool ValidateEncryptInputs()
     {
-        if (IsBusy) return;
-
-        if (string.IsNullOrWhiteSpace(InputFilePath) || string.IsNullOrWhiteSpace(OutputFilePath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select input and output file paths.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
+        InputFileHasError = string.IsNullOrWhiteSpace(InputFilePath);
+        OutputFileHasError = string.IsNullOrWhiteSpace(OutputFilePath);
 
         if (IsPasswordBased)
         {
-            if (string.IsNullOrEmpty(Password))
-            {
-                await _infoBarService.ShowAsync(bar =>
-                {
-                    bar.Title = "Validation";
-                    bar.Message = "Please enter a password.";
-                    bar.Severity = InfoBarSeverity.Warning;
-                });
-                return;
-            }
-
-            if (Password != ConfirmPassword)
-            {
-                await _infoBarService.ShowAsync(bar =>
-                {
-                    bar.Title = "Validation";
-                    bar.Message = "Passwords do not match.";
-                    bar.Severity = InfoBarSeverity.Warning;
-                });
-                return;
-            }
+            PasswordHasError = string.IsNullOrEmpty(Password);
         }
-        else if (string.IsNullOrWhiteSpace(KeyFilePath))
+        else
         {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a public key file.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
+            KeyFileHasError = string.IsNullOrWhiteSpace(KeyFilePath);
         }
+
+        return !(InputFileHasError || OutputFileHasError || PasswordHasError
+            || KeyFileHasError || HasPasswordMismatch);
+    }
+
+    private async Task EncryptAsync()
+    {
+        if (IsBusy) return;
+        if (!ValidateEncryptInputs()) return;
 
         IsBusy = true;
         Progress = 0;
@@ -319,42 +357,23 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         }
     }
 
+    private bool ValidateDecryptInputs()
+    {
+        InputFileHasError = string.IsNullOrWhiteSpace(InputFilePath);
+        OutputFileHasError = string.IsNullOrWhiteSpace(OutputFilePath);
+
+        if (IsPasswordBased)
+            PasswordHasError = string.IsNullOrEmpty(Password);
+        else
+            KeyFileHasError = string.IsNullOrWhiteSpace(KeyFilePath);
+
+        return !(InputFileHasError || OutputFileHasError || PasswordHasError || KeyFileHasError);
+    }
+
     private async Task DecryptAsync()
     {
         if (IsBusy) return;
-
-        if (string.IsNullOrWhiteSpace(InputFilePath) || string.IsNullOrWhiteSpace(OutputFilePath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select input and output file paths.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (IsPasswordBased && string.IsNullOrEmpty(Password))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please enter a password.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (IsKeyBased && string.IsNullOrWhiteSpace(KeyFilePath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a private key file.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
+        if (!ValidateDecryptInputs()) return;
 
         IsBusy = true;
         Progress = 0;

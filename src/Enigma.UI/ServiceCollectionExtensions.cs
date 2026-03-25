@@ -33,11 +33,13 @@ public static class ServiceCollectionExtensions
             _ = services.AddTransient<GenerateKeysPageView>();
             _ = services.AddTransient<EncryptDecryptFilesPageView>();
             _ = services.AddTransient<GenerateLicensesPageView>();
+            _ = services.AddTransient<ValidateLicensesPageView>();
 
             _ = services.AddSingleton<MainWindowViewModel>();
             _ = services.AddSingleton<GenerateKeysPageViewModel>();
             _ = services.AddSingleton<EncryptDecryptFilesPageViewModel>();
             _ = services.AddSingleton<GenerateLicensesPageViewModel>();
+            _ = services.AddSingleton<ValidateLicensesPageViewModel>();
         }
     }
 }

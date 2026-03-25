@@ -30,18 +30,12 @@ public class GenerateLicensesPageViewModel : ObservableObject
 
         BrowseSigningKeyCommand = new AsyncRelayCommand(BrowseSigningKeyAsync);
         BrowseLicenseOutputCommand = new AsyncRelayCommand(BrowseLicenseOutputAsync);
-        BrowseValidateLicenseCommand = new AsyncRelayCommand(BrowseValidateLicenseAsync);
-        BrowseValidatePublicKeyCommand = new AsyncRelayCommand(BrowseValidatePublicKeyAsync);
         GenerateLicenseCommand = new AsyncRelayCommand(GenerateLicenseAsync);
-        ValidateLicenseCommand = new AsyncRelayCommand(ValidateLicenseAsync);
     }
 
     public AsyncRelayCommand BrowseSigningKeyCommand { get; }
     public AsyncRelayCommand BrowseLicenseOutputCommand { get; }
-    public AsyncRelayCommand BrowseValidateLicenseCommand { get; }
-    public AsyncRelayCommand BrowseValidatePublicKeyCommand { get; }
     public AsyncRelayCommand GenerateLicenseCommand { get; }
-    public AsyncRelayCommand ValidateLicenseCommand { get; }
 
     // --- Generation properties ---
 
@@ -49,14 +43,22 @@ public class GenerateLicensesPageViewModel : ObservableObject
     public string? ProductId
     {
         get => _productId;
-        set => SetProperty(ref _productId, value);
+        set
+        {
+            if (SetProperty(ref _productId, value))
+                ProductIdHasError = false;
+        }
     }
 
     private string? _owner;
     public string? Owner
     {
         get => _owner;
-        set => SetProperty(ref _owner, value);
+        set
+        {
+            if (SetProperty(ref _owner, value))
+                OwnerHasError = false;
+        }
     }
 
     private string? _deviceId;
@@ -93,7 +95,11 @@ public class GenerateLicensesPageViewModel : ObservableObject
     public string? SigningKeyPath
     {
         get => _signingKeyPath;
-        set => SetProperty(ref _signingKeyPath, value);
+        set
+        {
+            if (SetProperty(ref _signingKeyPath, value))
+                SigningKeyHasError = false;
+        }
     }
 
     private string? _signingKeyPassword;
@@ -107,7 +113,41 @@ public class GenerateLicensesPageViewModel : ObservableObject
     public string? LicenseOutputPath
     {
         get => _licenseOutputPath;
-        set => SetProperty(ref _licenseOutputPath, value);
+        set
+        {
+            if (SetProperty(ref _licenseOutputPath, value))
+                OutputPathHasError = false;
+        }
+    }
+
+    // --- Validation error flags ---
+
+    private bool _productIdHasError;
+    public bool ProductIdHasError
+    {
+        get => _productIdHasError;
+        set => SetProperty(ref _productIdHasError, value);
+    }
+
+    private bool _ownerHasError;
+    public bool OwnerHasError
+    {
+        get => _ownerHasError;
+        set => SetProperty(ref _ownerHasError, value);
+    }
+
+    private bool _signingKeyHasError;
+    public bool SigningKeyHasError
+    {
+        get => _signingKeyHasError;
+        set => SetProperty(ref _signingKeyHasError, value);
+    }
+
+    private bool _outputPathHasError;
+    public bool OutputPathHasError
+    {
+        get => _outputPathHasError;
+        set => SetProperty(ref _outputPathHasError, value);
     }
 
     private bool _isBusy;
@@ -117,57 +157,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
         set => SetProperty(ref _isBusy, value);
     }
 
-    // --- Validation properties ---
-
-    private string? _validateLicensePath;
-    public string? ValidateLicensePath
-    {
-        get => _validateLicensePath;
-        set => SetProperty(ref _validateLicensePath, value);
-    }
-
-    private string? _validatePublicKeyPath;
-    public string? ValidatePublicKeyPath
-    {
-        get => _validatePublicKeyPath;
-        set => SetProperty(ref _validatePublicKeyPath, value);
-    }
-
-    private string? _validateProductId;
-    public string? ValidateProductId
-    {
-        get => _validateProductId;
-        set => SetProperty(ref _validateProductId, value);
-    }
-
-    private string? _validateDeviceId;
-    public string? ValidateDeviceId
-    {
-        get => _validateDeviceId;
-        set => SetProperty(ref _validateDeviceId, value);
-    }
-
-    private string? _validationResult;
-    public string? ValidationResult
-    {
-        get => _validationResult;
-        set
-        {
-            if (SetProperty(ref _validationResult, value))
-                OnPropertyChanged(nameof(HasValidationResult));
-        }
-    }
-
-    private bool? _isValidationSuccess;
-    public bool? IsValidationSuccess
-    {
-        get => _isValidationSuccess;
-        set => SetProperty(ref _isValidationSuccess, value);
-    }
-
-    public bool HasValidationResult => ValidationResult is not null;
-
-    // --- Browse commands (Generation) ---
+    // --- Browse commands ---
 
     private async Task BrowseSigningKeyAsync()
     {
@@ -185,73 +175,21 @@ public class GenerateLicensesPageViewModel : ObservableObject
             LicenseOutputPath = path;
     }
 
-    // --- Browse commands (Validation) ---
-
-    private async Task BrowseValidateLicenseAsync()
-    {
-        var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select License File", false, _defaultPaths.Licenses, "", null);
-        if (paths.Any())
-            ValidateLicensePath = paths.First();
-    }
-
-    private async Task BrowseValidatePublicKeyAsync()
-    {
-        var paths = await _fileDialogService.ShowOpenFileDialogAsync(
-            "Select Public Key", false, _defaultPaths.Keys, "", null);
-        if (paths.Any())
-            ValidatePublicKeyPath = paths.First();
-    }
-
     // --- Generate License ---
+
+    private bool ValidateInputs()
+    {
+        ProductIdHasError = string.IsNullOrWhiteSpace(ProductId);
+        OwnerHasError = string.IsNullOrWhiteSpace(Owner);
+        SigningKeyHasError = string.IsNullOrWhiteSpace(SigningKeyPath);
+        OutputPathHasError = string.IsNullOrWhiteSpace(LicenseOutputPath);
+        return !(ProductIdHasError || OwnerHasError || SigningKeyHasError || OutputPathHasError);
+    }
 
     private async Task GenerateLicenseAsync()
     {
         if (IsBusy) return;
-
-        if (string.IsNullOrWhiteSpace(ProductId))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please enter a Product ID.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(Owner))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please enter an Owner.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(SigningKeyPath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a signing key file.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(LicenseOutputPath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a license output path.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
+        if (!ValidateInputs()) return;
 
         IsBusy = true;
         try
@@ -305,59 +243,4 @@ public class GenerateLicensesPageViewModel : ObservableObject
         }
     }
 
-    // --- Validate License ---
-
-    private async Task ValidateLicenseAsync()
-    {
-        if (IsBusy) return;
-
-        if (string.IsNullOrWhiteSpace(ValidateLicensePath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a license file.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(ValidatePublicKeyPath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select a public key file.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            await using var licenseStream = File.OpenRead(ValidateLicensePath);
-            var license = await License.LoadAsync(licenseStream);
-
-            await using var keyStream = File.OpenRead(ValidatePublicKeyPath);
-            var publicKey = PemUtils.LoadKey(keyStream);
-
-            var (isValid, errorMessage) = new LicenseService()
-                .IsValid(license!, publicKey, ValidateProductId ?? "", ValidateDeviceId);
-
-            IsValidationSuccess = isValid;
-            ValidationResult = isValid
-                ? "License is valid."
-                : $"License is invalid: {errorMessage}";
-        }
-        catch (Exception ex)
-        {
-            IsValidationSuccess = false;
-            ValidationResult = $"Error: {ex.Message}";
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
 }

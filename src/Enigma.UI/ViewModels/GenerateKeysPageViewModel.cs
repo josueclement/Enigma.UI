@@ -65,28 +65,74 @@ public class GenerateKeysPageViewModel : ObservableObject
     public string? Password
     {
         get => _password;
-        set => SetProperty(ref _password, value);
+        set
+        {
+            if (SetProperty(ref _password, value))
+            {
+                OnPropertyChanged(nameof(HasPasswordMismatch));
+                OnPropertyChanged(nameof(PasswordMismatchMessage));
+            }
+        }
     }
 
     private string? _confirmPassword;
     public string? ConfirmPassword
     {
         get => _confirmPassword;
-        set => SetProperty(ref _confirmPassword, value);
+        set
+        {
+            if (SetProperty(ref _confirmPassword, value))
+            {
+                OnPropertyChanged(nameof(HasPasswordMismatch));
+                OnPropertyChanged(nameof(PasswordMismatchMessage));
+            }
+        }
     }
+
+    public bool HasPasswordMismatch =>
+        !string.IsNullOrEmpty(Password) &&
+        !string.IsNullOrEmpty(ConfirmPassword) &&
+        Password != ConfirmPassword;
+
+    public string? PasswordMismatchMessage =>
+        HasPasswordMismatch ? "Passwords do not match" : null;
 
     private string? _publicKeyPath;
     public string? PublicKeyPath
     {
         get => _publicKeyPath;
-        set => SetProperty(ref _publicKeyPath, value);
+        set
+        {
+            if (SetProperty(ref _publicKeyPath, value))
+                PublicKeyPathHasError = false;
+        }
     }
 
     private string? _privateKeyPath;
     public string? PrivateKeyPath
     {
         get => _privateKeyPath;
-        set => SetProperty(ref _privateKeyPath, value);
+        set
+        {
+            if (SetProperty(ref _privateKeyPath, value))
+                PrivateKeyPathHasError = false;
+        }
+    }
+
+    // --- Validation error flags ---
+
+    private bool _publicKeyPathHasError;
+    public bool PublicKeyPathHasError
+    {
+        get => _publicKeyPathHasError;
+        set => SetProperty(ref _publicKeyPathHasError, value);
+    }
+
+    private bool _privateKeyPathHasError;
+    public bool PrivateKeyPathHasError
+    {
+        get => _privateKeyPathHasError;
+        set => SetProperty(ref _privateKeyPathHasError, value);
     }
 
     private bool _isBusy;
@@ -127,31 +173,17 @@ public class GenerateKeysPageViewModel : ObservableObject
             PrivateKeyPath = path;
     }
 
+    private bool ValidateInputs()
+    {
+        PublicKeyPathHasError = string.IsNullOrWhiteSpace(PublicKeyPath);
+        PrivateKeyPathHasError = string.IsNullOrWhiteSpace(PrivateKeyPath);
+        return !(PublicKeyPathHasError || PrivateKeyPathHasError || HasPasswordMismatch);
+    }
+
     private async Task GenerateKeysAsync()
     {
         if (IsBusy) return;
-
-        if (string.IsNullOrWhiteSpace(PublicKeyPath) || string.IsNullOrWhiteSpace(PrivateKeyPath))
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Please select output file paths for both keys.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(Password) && Password != ConfirmPassword)
-        {
-            await _infoBarService.ShowAsync(bar =>
-            {
-                bar.Title = "Validation";
-                bar.Message = "Passwords do not match.";
-                bar.Severity = InfoBarSeverity.Warning;
-            });
-            return;
-        }
+        if (!ValidateInputs()) return;
 
         IsBusy = true;
         try

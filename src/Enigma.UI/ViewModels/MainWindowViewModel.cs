@@ -56,6 +56,13 @@ public class MainWindowViewModel : ObservableObject
             PageType = typeof(GenerateLicensesPageView),
             PageViewModelType = typeof(GenerateLicensesPageViewModel)
         });
+        Navigation.Items.Add(new NavigationItem
+        {
+            Header = "Validate Licenses",
+            IconData = IconService.CreateGeometry(Icon.seal_check, IconType.regular),
+            PageType = typeof(ValidateLicensesPageView),
+            PageViewModelType = typeof(ValidateLicensesPageViewModel)
+        });
 
         var firstPage = _services.GetRequiredService<GenerateKeysPageView>();
         firstPage.DataContext = _services.GetRequiredService<GenerateKeysPageViewModel>();

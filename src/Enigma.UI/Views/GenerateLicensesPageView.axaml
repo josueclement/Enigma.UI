@@ -10,155 +10,94 @@
              x:DataType="vm:GenerateLicensesPageViewModel">
 
   <ScrollViewer>
-    <StackPanel Margin="24" Spacing="16">
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Left">
       <TextBlock Text="Generate Licenses"
                  FontSize="24"
                  FontWeight="SemiBold" />
-      <TextBlock Text="Generate and validate software licenses with RSA or ML-DSA signatures."
+      <TextBlock Text="Generate software licenses with RSA or ML-DSA signatures."
                  Opacity="0.7" TextWrapping="Wrap" />
 
-      <!-- ======== GENERATE SECTION ======== -->
-      <TextBlock Text="Generate License"
-                 FontSize="18"
-                 FontWeight="SemiBold"
-                 Margin="0,8,0,0" />
-
-      <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
-        <!-- License Details -->
-        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="0"
-                                    VerticalAlignment="Top"
-                                    Header="License Details"
-                                    Description="Configure the license metadata"
-                                    IsExpanded="True">
-          <StackPanel Spacing="12">
-            <editors:TextEditor Title="Product ID"
-                                Text="{Binding ProductId}"
-                                Watermark="Enter product identifier" />
-            <editors:TextEditor Title="Owner"
-                                Text="{Binding Owner}"
-                                Watermark="Enter license owner" />
-            <editors:TextEditor Title="Device ID"
-                                Text="{Binding DeviceId}"
-                                Watermark="Enter device identifier (optional)" />
-            <StackPanel Orientation="Horizontal" Spacing="12">
-              <CheckBox Content="Set Expiration Date"
-                        IsChecked="{Binding HasExpiration}" />
-              <CalendarDatePicker SelectedDate="{Binding ExpirationDate}"
-                                  IsVisible="{Binding HasExpiration}"
-                                  Watermark="Select date" />
-            </StackPanel>
+      <!-- License Details -->
+      <carbon:SettingsCardExpander Header="License Details"
+                                  Description="Configure the license metadata"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Product ID"
+                              Text="{Binding ProductId}"
+                              Watermark="Enter product identifier"
+                              HasValidationError="{Binding ProductIdHasError}"
+                              ValidationErrorMessage="Required" />
+          <editors:TextEditor Title="Owner"
+                              Text="{Binding Owner}"
+                              Watermark="Enter license owner"
+                              HasValidationError="{Binding OwnerHasError}"
+                              ValidationErrorMessage="Required" />
+          <editors:TextEditor Title="Device ID"
+                              Text="{Binding DeviceId}"
+                              Watermark="Enter device identifier (optional)" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <CheckBox Content="Set Expiration Date"
+                      IsChecked="{Binding HasExpiration}" />
+            <CalendarDatePicker SelectedDate="{Binding ExpirationDate}"
+                                IsVisible="{Binding HasExpiration}"
+                                Watermark="Select date" />
           </StackPanel>
-        </carbon:SettingsCardExpander>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
 
-        <!-- Signing Configuration -->
-        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="2"
-                                    VerticalAlignment="Top"
-                                    Header="Signing Configuration"
-                                    Description="Select the signing algorithm and private key"
-                                    IsExpanded="True">
-          <StackPanel Spacing="12">
-            <TextBlock Text="Signing Algorithm" FontWeight="SemiBold" />
-            <ComboBox ItemsSource="{Binding SigningAlgorithmOptions}"
-                      SelectedIndex="{Binding SelectedSigningAlgorithmIndex}"
-                      HorizontalAlignment="Stretch" />
-            <DockPanel>
-              <Button DockPanel.Dock="Right" Content="Browse..."
+      <!-- Signing Configuration -->
+      <carbon:SettingsCardExpander Header="Signing Configuration"
+                                  Description="Select the signing algorithm and private key"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Signing Algorithm" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding SigningAlgorithmOptions}"
+                    SelectedIndex="{Binding SelectedSigningAlgorithmIndex}"
+                    HorizontalAlignment="Stretch" />
+          <editors:TextEditor Title="Private Key File"
+                              Text="{Binding SigningKeyPath}"
+                              IsReadOnly="True"
+                              Watermark="Select signing key..."
+                              HasValidationError="{Binding SigningKeyHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
                       Command="{Binding BrowseSigningKeyCommand}"
-                      VerticalAlignment="Bottom"
-                      Margin="8,0,0,0" />
-              <editors:TextEditor Title="Private Key File"
-                                  Text="{Binding SigningKeyPath}"
-                                  IsReadOnly="True"
-                                  Watermark="Select signing key..." />
-            </DockPanel>
-            <editors:TextEditor Title="Key Password"
-                                Text="{Binding SigningKeyPassword}"
-                                PasswordChar="&#x2022;"
-                                Watermark="Password for encrypted key (optional)" />
-          </StackPanel>
-        </carbon:SettingsCardExpander>
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Key Password"
+                              Text="{Binding SigningKeyPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Password for encrypted key (optional)" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
 
-        <!-- Output -->
-        <carbon:SettingsCardExpander Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                    Header="Output"
-                                    Description="Select where to save the license file"
-                                    IsExpanded="True">
-          <DockPanel>
-            <Button DockPanel.Dock="Right" Content="Browse..."
+      <!-- Output -->
+      <carbon:SettingsCardExpander Header="Output"
+                                  Description="Select where to save the license file"
+                                  IsExpanded="True">
+        <editors:TextEditor Title="License File"
+                            Text="{Binding LicenseOutputPath}"
+                            IsReadOnly="True"
+                            Watermark="Select license output path..."
+                            HasValidationError="{Binding OutputPathHasError}"
+                            ValidationErrorMessage="Required">
+          <editors:TextEditor.ActionContent>
+            <Button Content="Browse..."
                     Command="{Binding BrowseLicenseOutputCommand}"
-                    VerticalAlignment="Bottom"
-                    Margin="8,0,0,0" />
-            <editors:TextEditor Title="License File"
-                                Text="{Binding LicenseOutputPath}"
-                                IsReadOnly="True"
-                                Watermark="Select license output path..." />
-          </DockPanel>
-        </carbon:SettingsCardExpander>
-      </Grid>
+                    Classes="borderless"
+                    Padding="4,2" />
+          </editors:TextEditor.ActionContent>
+        </editors:TextEditor>
+      </carbon:SettingsCardExpander>
 
       <!-- Generate Button -->
       <Button Content="Generate License"
               Command="{Binding GenerateLicenseCommand}"
               HorizontalAlignment="Right"
               Classes="accent" />
-
-      <!-- ======== SEPARATOR ======== -->
-      <Separator Margin="0,8" />
-
-      <!-- ======== VALIDATE SECTION ======== -->
-      <TextBlock Text="Validate License"
-                 FontSize="18"
-                 FontWeight="SemiBold" />
-
-      <!-- Validation Inputs -->
-      <carbon:SettingsCardExpander Header="Validation Inputs"
-                                  Description="Select the license and public key to validate"
-                                  IsExpanded="True">
-        <StackPanel Spacing="12">
-          <DockPanel>
-            <Button DockPanel.Dock="Right" Content="Browse..."
-                    Command="{Binding BrowseValidateLicenseCommand}"
-                    VerticalAlignment="Bottom"
-                    Margin="8,0,0,0" />
-            <editors:TextEditor Title="License File"
-                                Text="{Binding ValidateLicensePath}"
-                                IsReadOnly="True"
-                                Watermark="Select license file..." />
-          </DockPanel>
-          <DockPanel>
-            <Button DockPanel.Dock="Right" Content="Browse..."
-                    Command="{Binding BrowseValidatePublicKeyCommand}"
-                    VerticalAlignment="Bottom"
-                    Margin="8,0,0,0" />
-            <editors:TextEditor Title="Public Key File"
-                                Text="{Binding ValidatePublicKeyPath}"
-                                IsReadOnly="True"
-                                Watermark="Select public key file..." />
-          </DockPanel>
-          <editors:TextEditor Title="Product ID"
-                              Text="{Binding ValidateProductId}"
-                              Watermark="Product ID to validate against" />
-          <editors:TextEditor Title="Device ID"
-                              Text="{Binding ValidateDeviceId}"
-                              Watermark="Device ID to validate against (optional)" />
-        </StackPanel>
-      </carbon:SettingsCardExpander>
-
-      <!-- Validate Button -->
-      <Button Content="Validate License"
-              Command="{Binding ValidateLicenseCommand}"
-              HorizontalAlignment="Right"
-              Classes="accent" />
-
-      <!-- Validation Result -->
-      <Border IsVisible="{Binding HasValidationResult}"
-              Padding="16"
-              CornerRadius="4"
-              BorderThickness="1"
-              BorderBrush="{DynamicResource CarbonBackgroundBrush}">
-        <TextBlock Text="{Binding ValidationResult}"
-                   TextWrapping="Wrap" />
-      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

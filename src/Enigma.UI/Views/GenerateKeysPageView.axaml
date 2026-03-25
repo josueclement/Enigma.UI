@@ -10,79 +10,80 @@
              x:DataType="vm:GenerateKeysPageViewModel">
 
   <ScrollViewer>
-    <StackPanel Margin="24" Spacing="16">
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Left">
       <TextBlock Text="Generate Keys"
                  FontSize="24"
                  FontWeight="SemiBold" />
       <TextBlock Text="Generate cryptographic key pairs for encryption, signing, and post-quantum algorithms."
                  Opacity="0.7" TextWrapping="Wrap" />
 
-      <Grid ColumnDefinitions="*,16,*" RowDefinitions="Auto,16,Auto">
-        <!-- Algorithm Configuration -->
-        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="0"
-                                    VerticalAlignment="Top"
-                                    Header="Algorithm Configuration"
-                                    Description="Select the algorithm and parameters for key generation"
-                                    IsExpanded="True">
-          <StackPanel Spacing="12">
-            <TextBlock Text="Algorithm" FontWeight="SemiBold" />
-            <ComboBox ItemsSource="{Binding AlgorithmOptions}"
-                      SelectedIndex="{Binding SelectedAlgorithmIndex}"
-                      HorizontalAlignment="Stretch" />
-            <TextBlock Text="Parameters" FontWeight="SemiBold" />
-            <ComboBox ItemsSource="{Binding ParameterOptions}"
-                      SelectedIndex="{Binding SelectedParameterIndex}"
-                      HorizontalAlignment="Stretch" />
-          </StackPanel>
-        </carbon:SettingsCardExpander>
+      <!-- Algorithm Configuration -->
+      <carbon:SettingsCardExpander Header="Algorithm Configuration"
+                                  Description="Select the algorithm and parameters for key generation"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Algorithm" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding AlgorithmOptions}"
+                    SelectedIndex="{Binding SelectedAlgorithmIndex}"
+                    HorizontalAlignment="Stretch" />
+          <TextBlock Text="Parameters" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding ParameterOptions}"
+                    SelectedIndex="{Binding SelectedParameterIndex}"
+                    HorizontalAlignment="Stretch" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
 
-        <!-- Private Key Protection -->
-        <carbon:SettingsCardExpander Grid.Row="0" Grid.Column="2"
-                                    VerticalAlignment="Top"
-                                    Header="Private Key Protection"
-                                    Description="Optionally encrypt the private key with a password"
-                                    IsExpanded="True">
-          <StackPanel Spacing="12">
-            <editors:TextEditor Title="Password"
-                                Text="{Binding Password}"
-                                PasswordChar="&#x2022;"
-                                Watermark="Enter password (optional)" />
-            <editors:TextEditor Title="Confirm Password"
-                                Text="{Binding ConfirmPassword}"
-                                PasswordChar="&#x2022;"
-                                Watermark="Confirm password" />
-          </StackPanel>
-        </carbon:SettingsCardExpander>
+      <!-- Private Key Protection -->
+      <carbon:SettingsCardExpander Header="Private Key Protection"
+                                  Description="Optionally encrypt the private key with a password"
+                                  IsExpanded="False">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Password"
+                              Text="{Binding Password}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Enter password (optional)" />
+          <editors:TextEditor Title="Confirm Password"
+                              Text="{Binding ConfirmPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Confirm password"
+                              HasValidationError="{Binding HasPasswordMismatch}"
+                              ValidationErrorMessage="{Binding PasswordMismatchMessage}" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
 
-        <!-- Output Files -->
-        <carbon:SettingsCardExpander Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                    Header="Output Files"
-                                    Description="Select where to save the generated keys"
-                                    IsExpanded="True">
-          <StackPanel Spacing="12">
-            <DockPanel>
-              <Button DockPanel.Dock="Right" Content="Browse..."
+      <!-- Output Files -->
+      <carbon:SettingsCardExpander Header="Output Files"
+                                  Description="Select where to save the generated keys"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Public Key File"
+                              Text="{Binding PublicKeyPath}"
+                              IsReadOnly="True"
+                              Watermark="Select public key output path..."
+                              HasValidationError="{Binding PublicKeyPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
                       Command="{Binding BrowsePublicKeyPathCommand}"
-                      VerticalAlignment="Bottom"
-                      Margin="8,0,0,0" />
-              <editors:TextEditor Title="Public Key File"
-                                  Text="{Binding PublicKeyPath}"
-                                  IsReadOnly="True"
-                                  Watermark="Select public key output path..." />
-            </DockPanel>
-            <DockPanel>
-              <Button DockPanel.Dock="Right" Content="Browse..."
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Private Key File"
+                              Text="{Binding PrivateKeyPath}"
+                              IsReadOnly="True"
+                              Watermark="Select private key output path..."
+                              HasValidationError="{Binding PrivateKeyPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
                       Command="{Binding BrowsePrivateKeyPathCommand}"
-                      VerticalAlignment="Bottom"
-                      Margin="8,0,0,0" />
-              <editors:TextEditor Title="Private Key File"
-                                  Text="{Binding PrivateKeyPath}"
-                                  IsReadOnly="True"
-                                  Watermark="Select private key output path..." />
-            </DockPanel>
-          </StackPanel>
-        </carbon:SettingsCardExpander>
-      </Grid>
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
 
       <!-- Generate Button -->
       <Button Content="Generate Keys"
