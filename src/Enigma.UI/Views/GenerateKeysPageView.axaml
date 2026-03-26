@@ -36,7 +36,7 @@
       <!-- Private Key Protection -->
       <carbon:SettingsCardExpander Header="Private Key Protection"
                                   Description="Optionally encrypt the private key with a password"
-                                  IsExpanded="False">
+                                  IsExpanded="True">
         <StackPanel Spacing="12">
           <editors:TextEditor Title="Password"
                               Text="{Binding Password}"
@@ -58,7 +58,6 @@
         <StackPanel Spacing="12">
           <editors:TextEditor Title="Public Key File"
                               Text="{Binding PublicKeyPath}"
-                              IsReadOnly="True"
                               Watermark="Select public key output path..."
                               HasValidationError="{Binding PublicKeyPathHasError}"
                               ValidationErrorMessage="Required">
@@ -71,7 +70,6 @@
           </editors:TextEditor>
           <editors:TextEditor Title="Private Key File"
                               Text="{Binding PrivateKeyPath}"
-                              IsReadOnly="True"
                               Watermark="Select private key output path..."
                               HasValidationError="{Binding PrivateKeyPathHasError}"
                               ValidationErrorMessage="Required">

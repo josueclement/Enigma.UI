@@ -44,6 +44,7 @@ sealed class Program
                 });
                 services.AddAppConfiguration(context.Configuration);
                 services.AddCarbonServices();
+                services.AddCryptographyServices();
                 services.AddPagesAndViewModels();
             })
             .Build();

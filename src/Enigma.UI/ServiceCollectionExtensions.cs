@@ -1,4 +1,8 @@
 using Carbon.Avalonia.Desktop.Services;
+using Enigma.Cryptography.DataEncryption;
+using Enigma.Cryptography.PQC;
+using Enigma.Cryptography.PublicKey;
+using Enigma.LicenseManager;
 using Enigma.UI.Models;
 using Enigma.UI.ViewModels;
 using Enigma.UI.Views;
@@ -25,6 +29,18 @@ public static class ServiceCollectionExtensions
             _ = services.AddSingleton<IContentDialogService, ContentDialogService>();
             _ = services.AddSingleton<IInfoBarService, InfoBarService>();
             _ = services.AddSingleton<IOverlayService, OverlayService>();
+        }
+
+        public void AddCryptographyServices()
+        {
+            _ = services.AddSingleton<PublicKeyServiceFactory>();
+            _ = services.AddSingleton<MLKemServiceFactory>();
+            _ = services.AddSingleton<MLDsaServiceFactory>();
+            _ = services.AddSingleton<Pbkdf2DataEncryptionService>();
+            _ = services.AddSingleton<Argon2DataEncryptionService>();
+            _ = services.AddSingleton<RsaDataEncryptionService>();
+            _ = services.AddSingleton<MLKemDataEncryptionService>();
+            _ = services.AddSingleton<LicenseService>();
         }
 
         public void AddPagesAndViewModels()

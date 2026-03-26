@@ -19,16 +19,28 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly Pbkdf2DataEncryptionService _pbkdf2Service;
+    private readonly Argon2DataEncryptionService _argon2Service;
+    private readonly RsaDataEncryptionService _rsaService;
+    private readonly MLKemDataEncryptionService _mlKemService;
     private readonly DefaultPathsOptions _defaultPaths;
     private CancellationTokenSource? _cts;
 
     public EncryptDecryptFilesPageViewModel(
         IFileDialogService fileDialogService,
         IInfoBarService infoBarService,
+        Pbkdf2DataEncryptionService pbkdf2Service,
+        Argon2DataEncryptionService argon2Service,
+        RsaDataEncryptionService rsaService,
+        MLKemDataEncryptionService mlKemService,
         IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _pbkdf2Service = pbkdf2Service;
+        _argon2Service = argon2Service;
+        _rsaService = rsaService;
+        _mlKemService = mlKemService;
         _defaultPaths = defaultPaths.Value;
 
         BrowseKeyFileCommand = new AsyncRelayCommand(BrowseKeyFileAsync);
@@ -297,11 +309,11 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
             switch (SelectedEncryptionTypeIndex)
             {
                 case 0: // PBKDF2
-                    await new Pbkdf2DataEncryptionService().EncryptAsync(
+                    await _pbkdf2Service.EncryptAsync(
                         input, output, cipher, Password!, Iterations, progress, _cts.Token);
                     break;
                 case 1: // Argon2
-                    await new Argon2DataEncryptionService().EncryptAsync(
+                    await _argon2Service.EncryptAsync(
                         input, output, cipher, Encoding.UTF8.GetBytes(Password!),
                         Argon2Iterations, Argon2Parallelism, Argon2MemoryPowOfTwo,
                         progress, _cts.Token);
@@ -310,7 +322,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                 {
                     await using var keyStream = File.OpenRead(KeyFilePath!);
                     var publicKey = PemUtils.LoadKey(keyStream);
-                    await new RsaDataEncryptionService().EncryptAsync(
+                    await _rsaService.EncryptAsync(
                         input, output, cipher, publicKey, progress, _cts.Token);
                     break;
                 }
@@ -318,7 +330,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                 {
                     await using var keyStream = File.OpenRead(KeyFilePath!);
                     var publicKey = PemUtils.LoadKey(keyStream);
-                    await new MLKemDataEncryptionService().EncryptAsync(
+                    await _mlKemService.EncryptAsync(
                         input, output, cipher, publicKey, progress, _cts.Token);
                     break;
                 }
@@ -388,11 +400,11 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
             switch (SelectedEncryptionTypeIndex)
             {
                 case 0: // PBKDF2
-                    await new Pbkdf2DataEncryptionService().DecryptAsync(
+                    await _pbkdf2Service.DecryptAsync(
                         input, output, Password!, progress, _cts.Token);
                     break;
                 case 1: // Argon2
-                    await new Argon2DataEncryptionService().DecryptAsync(
+                    await _argon2Service.DecryptAsync(
                         input, output, Encoding.UTF8.GetBytes(Password!),
                         progress, _cts.Token);
                     break;
@@ -402,7 +414,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                     var privateKey = !string.IsNullOrEmpty(KeyPassword)
                         ? PemUtils.LoadPrivateKey(keyStream, KeyPassword)
                         : PemUtils.LoadKey(keyStream);
-                    await new RsaDataEncryptionService().DecryptAsync(
+                    await _rsaService.DecryptAsync(
                         input, output, privateKey, progress, _cts.Token);
                     break;
                 }
@@ -412,7 +424,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                     var privateKey = !string.IsNullOrEmpty(KeyPassword)
                         ? PemUtils.LoadPrivateKey(keyStream, KeyPassword)
                         : PemUtils.LoadKey(keyStream);
-                    await new MLKemDataEncryptionService().DecryptAsync(
+                    await _mlKemService.DecryptAsync(
                         input, output, privateKey, progress, _cts.Token);
                     break;
                 }

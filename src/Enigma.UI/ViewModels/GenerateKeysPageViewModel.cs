@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Enigma.Cryptography.PQC;
 using Enigma.Cryptography.PublicKey;
 using Enigma.Cryptography.Utils;
+using Enigma.UI.Controls;
 using Enigma.UI.Models;
 using Microsoft.Extensions.Options;
 
@@ -18,15 +19,27 @@ public class GenerateKeysPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly IOverlayService _overlayService;
+    private readonly PublicKeyServiceFactory _publicKeyServiceFactory;
+    private readonly MLKemServiceFactory _mlKemServiceFactory;
+    private readonly MLDsaServiceFactory _mlDsaServiceFactory;
     private readonly DefaultPathsOptions _defaultPaths;
 
     public GenerateKeysPageViewModel(
         IFileDialogService fileDialogService,
         IInfoBarService infoBarService,
+        IOverlayService overlayService,
+        PublicKeyServiceFactory publicKeyServiceFactory,
+        MLKemServiceFactory mlKemServiceFactory,
+        MLDsaServiceFactory mlDsaServiceFactory,
         IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _overlayService = overlayService;
+        _publicKeyServiceFactory = publicKeyServiceFactory;
+        _mlKemServiceFactory = mlKemServiceFactory;
+        _mlDsaServiceFactory = mlDsaServiceFactory;
         _defaultPaths = defaultPaths.Value;
         UpdateParameterOptions();
 
@@ -186,23 +199,29 @@ public class GenerateKeysPageViewModel : ObservableObject
         if (!ValidateInputs()) return;
 
         IsBusy = true;
+        await _overlayService.ShowAsync(new ProgressOverlayCard
+        {
+            Title = "Generating Keys",
+            Message = "This may take a moment...",
+            IsIndeterminate = true
+        });
         try
         {
             var keyPair = await Task.Run(() => SelectedAlgorithmIndex switch
             {
-                0 => new PublicKeyServiceFactory().CreateRsaService()
+                0 => _publicKeyServiceFactory.CreateRsaService()
                     .GenerateKeyPair(int.Parse(ParameterOptions[SelectedParameterIndex])),
                 1 => SelectedParameterIndex switch
                 {
-                    0 => new MLKemServiceFactory().CreateKem512().GenerateKeyPair(),
-                    1 => new MLKemServiceFactory().CreateKem768().GenerateKeyPair(),
-                    _ => new MLKemServiceFactory().CreateKem1024().GenerateKeyPair()
+                    0 => _mlKemServiceFactory.CreateKem512().GenerateKeyPair(),
+                    1 => _mlKemServiceFactory.CreateKem768().GenerateKeyPair(),
+                    _ => _mlKemServiceFactory.CreateKem1024().GenerateKeyPair()
                 },
                 2 => SelectedParameterIndex switch
                 {
-                    0 => new MLDsaServiceFactory().CreateDsa44Service().GenerateKeyPair(),
-                    1 => new MLDsaServiceFactory().CreateDsa65Service().GenerateKeyPair(),
-                    _ => new MLDsaServiceFactory().CreateDsa87Service().GenerateKeyPair()
+                    0 => _mlDsaServiceFactory.CreateDsa44Service().GenerateKeyPair(),
+                    1 => _mlDsaServiceFactory.CreateDsa65Service().GenerateKeyPair(),
+                    _ => _mlDsaServiceFactory.CreateDsa87Service().GenerateKeyPair()
                 },
                 _ => throw new InvalidOperationException("Invalid algorithm selection")
             });
@@ -221,6 +240,7 @@ public class GenerateKeysPageViewModel : ObservableObject
                 PemUtils.SaveKey(keyPair.Private, privStream);
             }
 
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Success";
@@ -230,6 +250,7 @@ public class GenerateKeysPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Error";

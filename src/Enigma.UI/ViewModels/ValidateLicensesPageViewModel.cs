@@ -17,15 +17,18 @@ public class ValidateLicensesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly LicenseService _licenseService;
     private readonly DefaultPathsOptions _defaultPaths;
 
     public ValidateLicensesPageViewModel(
         IFileDialogService fileDialogService,
         IInfoBarService infoBarService,
+        LicenseService licenseService,
         IOptions<DefaultPathsOptions> defaultPaths)
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _licenseService = licenseService;
         _defaultPaths = defaultPaths.Value;
 
         BrowseValidateLicenseCommand = new AsyncRelayCommand(BrowseValidateLicenseAsync);
@@ -153,7 +156,7 @@ public class ValidateLicensesPageViewModel : ObservableObject
             await using var keyStream = File.OpenRead(ValidatePublicKeyPath);
             var publicKey = PemUtils.LoadKey(keyStream);
 
-            var (isValid, errorMessage) = new LicenseService()
+            var (isValid, errorMessage) = _licenseService
                 .IsValid(license!, publicKey, ValidateProductId ?? "", ValidateDeviceId);
 
             IsValidationSuccess = isValid;
