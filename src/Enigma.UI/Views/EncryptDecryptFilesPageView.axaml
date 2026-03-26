@@ -3,6 +3,7 @@
              xmlns:vm="using:Enigma.UI.ViewModels"
              xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
              xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="800"
@@ -78,8 +79,8 @@
         <StackPanel Spacing="12">
           <editors:TextEditor Title="Key File"
                               Text="{Binding KeyFilePath}"
-                              IsReadOnly="True"
                               Watermark="Select key file..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding KeyFileHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
@@ -103,8 +104,8 @@
         <StackPanel Spacing="12">
           <editors:TextEditor Title="Input File"
                               Text="{Binding InputFilePath}"
-                              IsReadOnly="True"
                               Watermark="Select input file..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding InputFileHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
@@ -116,8 +117,8 @@
           </editors:TextEditor>
           <editors:TextEditor Title="Output File"
                               Text="{Binding OutputFilePath}"
-                              IsReadOnly="True"
                               Watermark="Select output file..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding OutputFileHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>

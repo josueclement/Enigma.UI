@@ -3,6 +3,7 @@
              xmlns:vm="using:Enigma.UI.ViewModels"
              xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
              xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
@@ -59,6 +60,7 @@
           <editors:TextEditor Title="Public Key File"
                               Text="{Binding PublicKeyPath}"
                               Watermark="Select public key output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding PublicKeyPathHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
@@ -71,6 +73,7 @@
           <editors:TextEditor Title="Private Key File"
                               Text="{Binding PrivateKeyPath}"
                               Watermark="Select private key output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding PrivateKeyPathHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>

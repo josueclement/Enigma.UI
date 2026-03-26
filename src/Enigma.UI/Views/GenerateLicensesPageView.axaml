@@ -3,6 +3,7 @@
              xmlns:vm="using:Enigma.UI.ViewModels"
              xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
              xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="900"
@@ -56,8 +57,8 @@
                     HorizontalAlignment="Stretch" />
           <editors:TextEditor Title="Private Key File"
                               Text="{Binding SigningKeyPath}"
-                              IsReadOnly="True"
                               Watermark="Select signing key..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding SigningKeyHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
@@ -80,8 +81,8 @@
                                   IsExpanded="True">
         <editors:TextEditor Title="License File"
                             Text="{Binding LicenseOutputPath}"
-                            IsReadOnly="True"
                             Watermark="Select license output path..."
+                            helpers:FileDropHelper.IsEnabled="True"
                             HasValidationError="{Binding OutputPathHasError}"
                             ValidationErrorMessage="Required">
           <editors:TextEditor.ActionContent>

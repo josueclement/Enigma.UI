@@ -3,6 +3,7 @@
              xmlns:vm="using:Enigma.UI.ViewModels"
              xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
              xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
@@ -24,8 +25,8 @@
         <StackPanel Spacing="12">
           <editors:TextEditor Title="License File"
                               Text="{Binding ValidateLicensePath}"
-                              IsReadOnly="True"
                               Watermark="Select license file..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding LicensePathHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
@@ -37,8 +38,8 @@
           </editors:TextEditor>
           <editors:TextEditor Title="Public Key File"
                               Text="{Binding ValidatePublicKeyPath}"
-                              IsReadOnly="True"
                               Watermark="Select public key file..."
+                              helpers:FileDropHelper.IsEnabled="True"
                               HasValidationError="{Binding PublicKeyPathHasError}"
                               ValidationErrorMessage="Required">
             <editors:TextEditor.ActionContent>
