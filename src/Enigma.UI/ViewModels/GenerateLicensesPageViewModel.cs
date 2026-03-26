@@ -75,8 +75,8 @@ public class GenerateLicensesPageViewModel : ObservableObject
         set => SetProperty(ref _hasExpiration, value);
     }
 
-    private DateTimeOffset? _expirationDate;
-    public DateTimeOffset? ExpirationDate
+    private DateTime? _expirationDate;
+    public DateTime? ExpirationDate
     {
         get => _expirationDate;
         set => SetProperty(ref _expirationDate, value);
@@ -209,7 +209,7 @@ public class GenerateLicensesPageViewModel : ObservableObject
                 builder.SetDeviceId(DeviceId);
 
             if (HasExpiration && ExpirationDate.HasValue)
-                builder.SetExpirationDate(ExpirationDate.Value.DateTime);
+                builder.SetExpirationDate(ExpirationDate.Value);
 
             if (SelectedSigningAlgorithmIndex == 0)
                 builder.SignWithRsa(privateKey);
