@@ -147,7 +147,7 @@ public class GenerateKeysPageViewModel : ObservableObject
         ParameterOptions.Clear();
         var options = SelectedAlgorithmIndex switch
         {
-            0 => new[] { "2048", "3072", "4096" },
+            0 => new[] { "2048", "3072", "4096", "8192" },
             1 => new[] { "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024" },
             2 => new[] { "ML-DSA-44", "ML-DSA-65", "ML-DSA-87" },
             _ => Array.Empty<string>()

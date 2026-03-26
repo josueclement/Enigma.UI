@@ -10,7 +10,7 @@
              x:DataType="vm:GenerateKeysPageViewModel">
 
   <ScrollViewer>
-    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Left">
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Stretch">
       <TextBlock Text="Generate Keys"
                  FontSize="24"
                  FontWeight="SemiBold" />
