@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Enigma.Cryptography.DataEncryption;
 using Enigma.Cryptography.Utils;
+using Enigma.UI.Controls;
 using Enigma.UI.Models;
 using Microsoft.Extensions.Options;
 
@@ -19,6 +20,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
 {
     private readonly IFileDialogService _fileDialogService;
     private readonly IInfoBarService _infoBarService;
+    private readonly IOverlayService _overlayService;
     private readonly Pbkdf2DataEncryptionService _pbkdf2Service;
     private readonly Argon2DataEncryptionService _argon2Service;
     private readonly RsaDataEncryptionService _rsaService;
@@ -29,6 +31,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     public EncryptDecryptFilesPageViewModel(
         IFileDialogService fileDialogService,
         IInfoBarService infoBarService,
+        IOverlayService overlayService,
         Pbkdf2DataEncryptionService pbkdf2Service,
         Argon2DataEncryptionService argon2Service,
         RsaDataEncryptionService rsaService,
@@ -37,6 +40,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
     {
         _fileDialogService = fileDialogService;
         _infoBarService = infoBarService;
+        _overlayService = overlayService;
         _pbkdf2Service = pbkdf2Service;
         _argon2Service = argon2Service;
         _rsaService = rsaService;
@@ -225,13 +229,6 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         set => SetProperty(ref _outputFileHasError, value);
     }
 
-    private int _progress;
-    public int Progress
-    {
-        get => _progress;
-        set => SetProperty(ref _progress, value);
-    }
-
     private bool _isBusy;
     public bool IsBusy
     {
@@ -296,13 +293,32 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         if (!ValidateEncryptInputs()) return;
 
         IsBusy = true;
-        Progress = 0;
         _cts = new CancellationTokenSource();
-        var progress = new Progress<int>(p => Progress = p);
 
+        await using var input = File.OpenRead(InputFilePath);
+        var card = new ProgressOverlayCard
+        {
+            Title = "Encrypting",
+            Message = "Encrypting file...",
+            IsIndeterminate = false,
+            Maximum = input.Length,
+            Content = new Avalonia.Controls.Button
+            {
+                Content = "Cancel",
+                Command = CancelCommand,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right
+            }
+        };
+        long totalBytes = 0;
+        var progress = new Progress<int>(bytesRead =>
+        {
+            totalBytes += bytesRead;
+            card.Progress = totalBytes;
+        });
+
+        await _overlayService.ShowAsync(card);
         try
         {
-            await using var input = File.OpenRead(InputFilePath);
             await using var output = File.Create(OutputFilePath);
             var cipher = GetSelectedCipher();
 
@@ -336,6 +352,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                 }
             }
 
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Success";
@@ -345,6 +362,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Cancelled";
@@ -354,6 +372,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Error";
@@ -388,13 +407,32 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         if (!ValidateDecryptInputs()) return;
 
         IsBusy = true;
-        Progress = 0;
         _cts = new CancellationTokenSource();
-        var progress = new Progress<int>(p => Progress = p);
 
+        await using var input = File.OpenRead(InputFilePath);
+        var card = new ProgressOverlayCard
+        {
+            Title = "Decrypting",
+            Message = "Decrypting file...",
+            IsIndeterminate = false,
+            Maximum = input.Length,
+            Content = new Avalonia.Controls.Button
+            {
+                Content = "Cancel",
+                Command = CancelCommand,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right
+            }
+        };
+        long totalBytes = 0;
+        var progress = new Progress<int>(bytesRead =>
+        {
+            totalBytes += bytesRead;
+            card.Progress = totalBytes;
+        });
+
+        await _overlayService.ShowAsync(card);
         try
         {
-            await using var input = File.OpenRead(InputFilePath);
             await using var output = File.Create(OutputFilePath);
 
             switch (SelectedEncryptionTypeIndex)
@@ -430,6 +468,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
                 }
             }
 
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Success";
@@ -439,6 +478,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Cancelled";
@@ -448,6 +488,7 @@ public class EncryptDecryptFilesPageViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            await _overlayService.HideAsync();
             await _infoBarService.ShowAsync(bar =>
             {
                 bar.Title = "Error";

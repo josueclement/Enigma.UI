@@ -130,16 +130,8 @@
         </StackPanel>
       </carbon:SettingsCardExpander>
 
-      <!-- Progress -->
-      <ProgressBar Value="{Binding Progress}"
-                   Maximum="100"
-                   IsVisible="{Binding IsBusy}" />
-
       <!-- Buttons -->
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-        <Button Content="Cancel"
-                Command="{Binding CancelCommand}"
-                IsVisible="{Binding IsBusy}" />
         <Button Content="Encrypt"
                 Command="{Binding EncryptCommand}"
                 Classes="accent" />
