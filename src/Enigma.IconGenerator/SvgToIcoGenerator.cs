@@ -10,6 +10,38 @@ public static class SvgToIcoGenerator
     private static readonly int[] DefaultSizes = [16, 24, 32, 48, 64, 128, 256];
 
     /// <summary>
+    /// Returns a multi-resolution ICO as an in-memory stream from a PhosphorIconsAvalonia icon.
+    /// </summary>
+    public static MemoryStream IcoFromPhosphorIcon(
+        Icon icon,
+        IconType iconType = IconType.fill,
+        int[]? sizes = null,
+        string? hexColor = null)
+    {
+        sizes ??= DefaultSizes;
+        var svgContent = LoadPhosphorSvg(ToResourceName(icon), iconType.ToString());
+
+        if (hexColor is not null)
+            svgContent = ApplyFillColor(svgContent, hexColor);
+
+        return BuildIcoStream(svgContent, sizes);
+    }
+
+    /// <summary>
+    /// Returns a multi-resolution ICO as an in-memory stream from an SVG file.
+    /// </summary>
+    public static MemoryStream IcoFromSvgFile(string svgPath, int[]? sizes = null, string? hexColor = null)
+    {
+        sizes ??= DefaultSizes;
+        var svgContent = File.ReadAllText(svgPath);
+
+        if (hexColor is not null)
+            svgContent = ApplyFillColor(svgContent, hexColor);
+
+        return BuildIcoStream(svgContent, sizes);
+    }
+
+    /// <summary>
     /// Generates a multi-resolution .ico file from an SVG file.
     /// </summary>
     public static void FromSvgFile(string svgPath, string outputPath, int[]? sizes = null, string? hexColor = null)
@@ -98,7 +130,8 @@ public static class SvgToIcoGenerator
     private static string LoadPhosphorSvg(string iconName, string style)
     {
         var assembly = Assembly.Load("PhosphorIconsAvalonia");
-        var resourceName = $"PhosphorIconsAvalonia.Icons.{style}.{iconName}-{style}.svg";
+        var fileName = style == "regular" ? iconName : $"{iconName}-{style}";
+        var resourceName = $"PhosphorIconsAvalonia.Icons.{style}.{fileName}.svg";
 
         using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new ArgumentException(
@@ -123,6 +156,15 @@ public static class SvgToIcoGenerator
         }
 
         return svgContent.Replace("<svg ", $"<svg fill=\"{hexColor}\" ");
+    }
+
+    private static MemoryStream BuildIcoStream(string svgContent, int[] sizes)
+    {
+        var pngImages = RenderSvgAtSizes(svgContent, sizes);
+        var ms = new MemoryStream();
+        IcoWriter.Write(ms, pngImages, sizes);
+        ms.Position = 0;
+        return ms;
     }
 
     private static List<byte[]> RenderSvgAtSizes(string svgContent, int[] sizes)

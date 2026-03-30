@@ -10,7 +10,6 @@
        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
        x:Class="Enigma.UI.Views.MainWindow"
        x:DataType="vm:MainWindowViewModel"
-       Icon="/Assets/app-icon.ico"
        Title="Enigma"
        Background="{DynamicResource CarbonBackgroundBrush}">
 

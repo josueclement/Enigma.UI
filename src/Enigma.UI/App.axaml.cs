@@ -5,12 +5,14 @@ using System;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Carbon.Avalonia.Desktop.Services;
+using Enigma.UI.Helpers;
 using Enigma.UI.Models;
 using Enigma.UI.ViewModels;
 using Enigma.UI.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using PhosphorIconsAvalonia;
 
 namespace Enigma.UI;
 
@@ -36,6 +38,7 @@ public partial class App : Application
             var mainWindow = services.GetRequiredService<MainWindow>();
             var vm = services.GetRequiredService<MainWindowViewModel>();
             mainWindow.DataContext = vm;
+            mainWindow.Icon = AppIconHelper.CreateWindowIcon(Icon.robot, IconType.regular, hexColor: "FFFFFF");
 
             services.GetRequiredService<IContentDialogService>().RegisterHost(mainWindow.HostDialog);
             services.GetRequiredService<IOverlayService>().RegisterHost(mainWindow.HostOverlay);
