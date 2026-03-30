@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
+using Avalonia.Media;
 using System;
 using System.Linq;
 using Avalonia.Markup.Xaml;
@@ -38,7 +39,7 @@ public partial class App : Application
             var mainWindow = services.GetRequiredService<MainWindow>();
             var vm = services.GetRequiredService<MainWindowViewModel>();
             mainWindow.DataContext = vm;
-            mainWindow.Icon = AppIconHelper.CreateWindowIcon(Icon.robot, IconType.regular, hexColor: "FFFFFF");
+            mainWindow.Icon = AppIconHelper.CreateWindowIcon(Icon.robot, IconType.fill, Colors.White);
 
             services.GetRequiredService<IContentDialogService>().RegisterHost(mainWindow.HostDialog);
             services.GetRequiredService<IOverlayService>().RegisterHost(mainWindow.HostOverlay);

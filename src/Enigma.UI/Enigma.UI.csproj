@@ -31,10 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Enigma.IconGenerator\Enigma.IconGenerator.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AvaloniaResource Include="Assets\app-icon.ico" />
   </ItemGroup>
 
