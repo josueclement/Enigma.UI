@@ -63,6 +63,34 @@ public class MainWindowViewModel : ObservableObject
             PageType = typeof(ValidateLicensesPageView),
             PageViewModelType = typeof(ValidateLicensesPageViewModel)
         });
+        Navigation.Items.Add(new NavigationItem
+        {
+            Header = "Generate Certificate",
+            IconData = IconService.CreateGeometry(Icon.seal, IconType.regular),
+            PageType = typeof(GenerateCertificatePageView),
+            PageViewModelType = typeof(GenerateCertificatePageViewModel)
+        });
+        Navigation.Items.Add(new NavigationItem
+        {
+            Header = "Sign Certificate",
+            IconData = IconService.CreateGeometry(Icon.pen_nib, IconType.regular),
+            PageType = typeof(SignCertificatePageView),
+            PageViewModelType = typeof(SignCertificatePageViewModel)
+        });
+        Navigation.Items.Add(new NavigationItem
+        {
+            Header = "Certificate Tools",
+            IconData = IconService.CreateGeometry(Icon.file_magnifying_glass, IconType.regular),
+            PageType = typeof(CertificateToolsPageView),
+            PageViewModelType = typeof(CertificateToolsPageViewModel)
+        });
+        Navigation.Items.Add(new NavigationItem
+        {
+            Header = "Certificate Info",
+            IconData = IconService.CreateGeometry(Icon.info, IconType.regular),
+            PageType = typeof(CertificateInfoPageView),
+            PageViewModelType = typeof(CertificateInfoPageViewModel)
+        });
 
         var firstPage = _services.GetRequiredService<GenerateKeysPageView>();
         firstPage.DataContext = _services.GetRequiredService<GenerateKeysPageViewModel>();

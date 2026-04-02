@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Enigma.UI.ViewModels"
+             xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
+             xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="900"
+             x:Class="Enigma.UI.Views.SignCertificatePageView"
+             x:DataType="vm:SignCertificatePageViewModel">
+
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Stretch">
+      <TextBlock Text="Sign Certificate"
+                 FontSize="24"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="Sign a certificate signing request (CSR) with a CA key to issue a certificate."
+                 Opacity="0.7" TextWrapping="Wrap" />
+
+      <!-- CSR Input -->
+      <carbon:SettingsCardExpander Header="Certificate Signing Request"
+                                  Description="Select and verify the CSR to sign"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="CSR File"
+                              Text="{Binding CsrFilePath}"
+                              Watermark="Select CSR file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding CsrFileHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseCsrFileCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Verify CSR"
+                  Command="{Binding VerifyCsrCommand}"
+                  Classes="borderless"
+                  HorizontalAlignment="Left" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- CA Configuration -->
+      <carbon:SettingsCardExpander Header="CA Configuration"
+                                  Description="Configure the certificate authority signing key and identity"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="CA Private Key File"
+                              Text="{Binding CaPrivateKeyPath}"
+                              Watermark="Select CA private key file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding CaPrivateKeyHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseCaPrivateKeyCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="CA Key Password"
+                              Text="{Binding CaPrivateKeyPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Enter password (optional)" />
+          <editors:TextEditor Title="Issuer Common Name (CN)"
+                              Text="{Binding IssuerCommonName}"
+                              Watermark="e.g. My Certificate Authority"
+                              HasValidationError="{Binding IssuerNameHasError}"
+                              ValidationErrorMessage="Required" />
+          <TextBlock Text="Signature Algorithm" FontWeight="SemiBold" />
+          <ComboBox ItemsSource="{Binding SignatureAlgorithmOptions}"
+                    SelectedIndex="{Binding SelectedSignatureAlgorithmIndex}"
+                    HorizontalAlignment="Stretch" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Certificate Options -->
+      <carbon:SettingsCardExpander Header="Certificate Options"
+                                  Description="Configure validity period and extensions"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Valid From" FontWeight="SemiBold" />
+              <CalendarDatePicker SelectedDate="{Binding ValidFrom}" />
+            </StackPanel>
+            <StackPanel Spacing="4">
+              <TextBlock Text="Valid To" FontWeight="SemiBold" />
+              <CalendarDatePicker SelectedDate="{Binding ValidTo}" />
+            </StackPanel>
+          </StackPanel>
+          <CheckBox Content="CA Certificate" IsChecked="{Binding IsCaCertificate}" />
+          <TextBlock Text="Key Usage" FontWeight="SemiBold" />
+          <WrapPanel>
+            <CheckBox Content="Digital Signature" IsChecked="{Binding KeyUsageDigitalSignature}" Margin="0,0,12,4" />
+            <CheckBox Content="Key Encipherment" IsChecked="{Binding KeyUsageKeyEncipherment}" Margin="0,0,12,4" />
+            <CheckBox Content="Key Cert Sign" IsChecked="{Binding KeyUsageKeyCertSign}" Margin="0,0,12,4" />
+            <CheckBox Content="CRL Sign" IsChecked="{Binding KeyUsageCrlSign}" Margin="0,0,12,4" />
+          </WrapPanel>
+          <editors:TextEditor Title="Subject Alternative Names"
+                              Text="{Binding SubjectAlternativeNames}"
+                              Watermark="Comma-separated DNS names (e.g. example.com, *.example.com)" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Output -->
+      <carbon:SettingsCardExpander Header="Output"
+                                  Description="Select where to save the issued certificate"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Certificate File"
+                              Text="{Binding CertificateOutputPath}"
+                              Watermark="Select certificate output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding CertificateOutputHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseCertificateOutputCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Issue Button -->
+      <Button Content="Issue Certificate"
+              Command="{Binding IssueCertificateCommand}"
+              HorizontalAlignment="Right"
+              Classes="accent" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

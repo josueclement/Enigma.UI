@@ -7,4 +7,5 @@ public class DefaultPathsOptions
     public string Keys { get; set; } = "";
     public string Licenses { get; set; } = "";
     public string EncryptedFiles { get; set; } = "";
+    public string Certificates { get; set; } = "";
 }

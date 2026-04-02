@@ -2,6 +2,7 @@ using Carbon.Avalonia.Desktop.Services;
 using Enigma.Cryptography.DataEncryption;
 using Enigma.Cryptography.PQC;
 using Enigma.Cryptography.PublicKey;
+using Enigma.Cryptography.X509;
 using Enigma.LicenseManager;
 using Enigma.UI.Models;
 using Enigma.UI.ViewModels;
@@ -41,6 +42,7 @@ public static class ServiceCollectionExtensions
             _ = services.AddSingleton<RsaDataEncryptionService>();
             _ = services.AddSingleton<MLKemDataEncryptionService>();
             _ = services.AddSingleton<LicenseService>();
+            _ = services.AddSingleton<X509CertificateServiceFactory>();
         }
 
         public void AddPagesAndViewModels()
@@ -50,12 +52,20 @@ public static class ServiceCollectionExtensions
             _ = services.AddTransient<EncryptDecryptFilesPageView>();
             _ = services.AddTransient<GenerateLicensesPageView>();
             _ = services.AddTransient<ValidateLicensesPageView>();
+            _ = services.AddTransient<GenerateCertificatePageView>();
+            _ = services.AddTransient<SignCertificatePageView>();
+            _ = services.AddTransient<CertificateToolsPageView>();
+            _ = services.AddTransient<CertificateInfoPageView>();
 
             _ = services.AddSingleton<MainWindowViewModel>();
             _ = services.AddSingleton<GenerateKeysPageViewModel>();
             _ = services.AddSingleton<EncryptDecryptFilesPageViewModel>();
             _ = services.AddSingleton<GenerateLicensesPageViewModel>();
             _ = services.AddSingleton<ValidateLicensesPageViewModel>();
+            _ = services.AddSingleton<GenerateCertificatePageViewModel>();
+            _ = services.AddSingleton<SignCertificatePageViewModel>();
+            _ = services.AddSingleton<CertificateToolsPageViewModel>();
+            _ = services.AddSingleton<CertificateInfoPageViewModel>();
         }
     }
 }

@@ -1,0 +1,226 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Enigma.UI.ViewModels"
+             xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
+             xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="1200"
+             x:Class="Enigma.UI.Views.CertificateToolsPageView"
+             x:DataType="vm:CertificateToolsPageViewModel">
+
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Stretch">
+      <TextBlock Text="Certificate Tools"
+                 FontSize="24"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="Inspect certificates, validate chains, and convert between PEM and PFX formats."
+                 Opacity="0.7" TextWrapping="Wrap" />
+
+      <!-- Inspect Certificate -->
+      <carbon:SettingsCardExpander Header="Inspect Certificate"
+                                  Description="Load a certificate and view its details"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Certificate File"
+                              Text="{Binding InspectCertificatePath}"
+                              Watermark="Select certificate file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding InspectCertificatePathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseInspectCertificateCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Inspect"
+                  Command="{Binding InspectCommand}"
+                  HorizontalAlignment="Left"
+                  Classes="accent" />
+          <Border IsVisible="{Binding HasInspectResult}"
+                  Padding="16"
+                  CornerRadius="4"
+                  BorderThickness="1"
+                  BorderBrush="{DynamicResource CarbonBackgroundBrush}">
+            <TextBlock Text="{Binding InspectResult}"
+                       TextWrapping="Wrap"
+                       FontFamily="Cascadia Mono, Consolas, Courier New, monospace"
+                       FontSize="12" />
+          </Border>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Validate Chain -->
+      <carbon:SettingsCardExpander Header="Validate Chain"
+                                  Description="Validate a certificate against trusted CA certificates"
+                                  IsExpanded="False">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Certificate to Validate"
+                              Text="{Binding ValidateCertificatePath}"
+                              Watermark="Select certificate file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ValidateCertificatePathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseValidateCertificateCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Trusted CA Certificates"
+                              Text="{Binding TrustedCaCertificatesPath}"
+                              Watermark="Select one or more CA certificate files..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding TrustedCaCertificatesPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseTrustedCaCertificatesCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Validate Chain"
+                  Command="{Binding ValidateChainCommand}"
+                  HorizontalAlignment="Left"
+                  Classes="accent" />
+          <Border IsVisible="{Binding HasChainValidationResult}"
+                  Padding="16"
+                  CornerRadius="4"
+                  BorderThickness="1"
+                  BorderBrush="{DynamicResource CarbonBackgroundBrush}">
+            <TextBlock Text="{Binding ChainValidationResult}"
+                       TextWrapping="Wrap" />
+          </Border>
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Export to PFX -->
+      <carbon:SettingsCardExpander Header="Export to PFX"
+                                  Description="Export a certificate and private key to a PKCS#12 (PFX) file"
+                                  IsExpanded="False">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Certificate File"
+                              Text="{Binding ExportCertificatePath}"
+                              Watermark="Select certificate file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ExportCertificatePathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseExportCertificateCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Private Key File"
+                              Text="{Binding ExportPrivateKeyPath}"
+                              Watermark="Select private key file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ExportPrivateKeyPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseExportPrivateKeyCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Private Key Password"
+                              Text="{Binding ExportPrivateKeyPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Password for encrypted key (optional)" />
+          <editors:TextEditor Title="PFX Alias"
+                              Text="{Binding PfxAlias}"
+                              Watermark="Friendly name for the PFX entry"
+                              HasValidationError="{Binding PfxAliasHasError}"
+                              ValidationErrorMessage="Required" />
+          <editors:TextEditor Title="PFX Password"
+                              Text="{Binding PfxPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Password to protect the PFX file"
+                              HasValidationError="{Binding PfxPasswordHasError}"
+                              ValidationErrorMessage="Required" />
+          <editors:TextEditor Title="PFX Output File"
+                              Text="{Binding PfxOutputPath}"
+                              Watermark="Select PFX output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding PfxOutputPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowsePfxOutputCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Export PFX"
+                  Command="{Binding ExportPfxCommand}"
+                  HorizontalAlignment="Left"
+                  Classes="accent" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Import from PFX -->
+      <carbon:SettingsCardExpander Header="Import from PFX"
+                                  Description="Extract a certificate and private key from a PKCS#12 (PFX) file"
+                                  IsExpanded="False">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="PFX File"
+                              Text="{Binding ImportPfxPath}"
+                              Watermark="Select PFX file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ImportPfxPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseImportPfxCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="PFX Password"
+                              Text="{Binding ImportPfxPassword}"
+                              PasswordChar="&#x2022;"
+                              Watermark="Password to unlock the PFX file"
+                              HasValidationError="{Binding ImportPfxPasswordHasError}"
+                              ValidationErrorMessage="Required" />
+          <editors:TextEditor Title="Certificate Output File"
+                              Text="{Binding ImportCertificateOutputPath}"
+                              Watermark="Select certificate output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ImportCertificateOutputPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseImportCertificateOutputCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <editors:TextEditor Title="Private Key Output File"
+                              Text="{Binding ImportPrivateKeyOutputPath}"
+                              Watermark="Select private key output path..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding ImportPrivateKeyOutputPathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseImportPrivateKeyOutputCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Import PFX"
+                  Command="{Binding ImportPfxCommand}"
+                  HorizontalAlignment="Left"
+                  Classes="accent" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

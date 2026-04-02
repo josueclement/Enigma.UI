@@ -1,0 +1,145 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Enigma.UI.ViewModels"
+             xmlns:carbon="using:Carbon.Avalonia.Desktop.Controls"
+             xmlns:editors="using:Carbon.Avalonia.Desktop.Controls.Editors"
+             xmlns:helpers="using:Enigma.UI.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="900"
+             x:Class="Enigma.UI.Views.CertificateInfoPageView"
+             x:DataType="vm:CertificateInfoPageViewModel">
+
+  <ScrollViewer>
+    <StackPanel Margin="24" Spacing="16" MaxWidth="800" HorizontalAlignment="Stretch">
+      <TextBlock Text="Certificate Info"
+                 FontSize="24"
+                 FontWeight="SemiBold" />
+      <TextBlock Text="Load an X.509 certificate and view its details."
+                 Opacity="0.7" TextWrapping="Wrap" />
+
+      <!-- Certificate File -->
+      <carbon:SettingsCardExpander Header="Certificate File"
+                                  Description="Select a PEM-encoded certificate to inspect"
+                                  IsExpanded="True">
+        <StackPanel Spacing="12">
+          <editors:TextEditor Title="Certificate File"
+                              Text="{Binding CertificatePath}"
+                              Watermark="Select certificate file..."
+                              helpers:FileDropHelper.IsEnabled="True"
+                              HasValidationError="{Binding CertificatePathHasError}"
+                              ValidationErrorMessage="Required">
+            <editors:TextEditor.ActionContent>
+              <Button Content="Browse..."
+                      Command="{Binding BrowseCertificateCommand}"
+                      Classes="borderless"
+                      Padding="4,2" />
+            </editors:TextEditor.ActionContent>
+          </editors:TextEditor>
+          <Button Content="Load Certificate"
+                  Command="{Binding LoadCertificateCommand}"
+                  HorizontalAlignment="Left"
+                  Classes="accent" />
+        </StackPanel>
+      </carbon:SettingsCardExpander>
+
+      <!-- Error Display -->
+      <Border IsVisible="{Binding HasError}"
+              Padding="16"
+              CornerRadius="4"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource SystemFillColorCriticalBrush}">
+        <TextBlock Text="{Binding ErrorMessage}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+      </Border>
+
+      <!-- Certificate Details -->
+      <StackPanel IsVisible="{Binding HasCertificateInfo}" Spacing="16">
+
+        <!-- Identity -->
+        <carbon:SettingsCardExpander Header="Identity"
+                                    Description="Subject and issuer information"
+                                    IsExpanded="True">
+          <StackPanel Spacing="8">
+            <StackPanel Spacing="2">
+              <TextBlock Text="Subject" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding Subject}" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Issuer" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding Issuer}" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+
+        <!-- Validity -->
+        <carbon:SettingsCardExpander Header="Validity"
+                                    Description="Certificate validity period and status"
+                                    IsExpanded="True">
+          <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Valid From" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+                <TextBlock Text="{Binding ValidFrom}" />
+              </StackPanel>
+              <StackPanel Spacing="2">
+                <TextBlock Text="Valid To" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+                <TextBlock Text="{Binding ValidTo}" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Currently Valid" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+                <TextBlock Text="{Binding IsValidNow}" />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+
+        <!-- Technical Details -->
+        <carbon:SettingsCardExpander Header="Technical Details"
+                                    Description="Algorithm, serial number, and version"
+                                    IsExpanded="True">
+          <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="24">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Version" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+                <TextBlock Text="{Binding Version}" />
+              </StackPanel>
+              <StackPanel Spacing="2">
+                <TextBlock Text="Signature Algorithm" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+                <TextBlock Text="{Binding SignatureAlgorithm}" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Serial Number" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding SerialNumber}" TextWrapping="Wrap"
+                         FontFamily="Cascadia Mono, Consolas, Courier New, monospace" FontSize="12" />
+            </StackPanel>
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+
+        <!-- Extensions -->
+        <carbon:SettingsCardExpander Header="Extensions"
+                                    Description="Key usage, basic constraints, and subject alternative names"
+                                    IsExpanded="True">
+          <StackPanel Spacing="8">
+            <StackPanel Spacing="2">
+              <TextBlock Text="CA Certificate" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding IsCa}" />
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Key Usage" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding KeyUsage}" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Subject Alternative Names" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
+              <TextBlock Text="{Binding SubjectAlternativeNames}" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </carbon:SettingsCardExpander>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

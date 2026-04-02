@@ -36,7 +36,8 @@ public static class ConfigurationSetup
                   "DefaultPaths": {
                     "Keys": "",
                     "Licenses": "",
-                    "EncryptedFiles": ""
+                    "EncryptedFiles": "",
+                    "Certificates": ""
                   }
                 }
                 """);
